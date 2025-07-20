@@ -3,6 +3,8 @@
 namespace Database\Seeders;
 
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+
+use App\Models\User;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
@@ -12,11 +14,18 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // \App\Models\User::factory(10)->create();
+        User::create([
+            'name' => 'Ahmad Syaifuddin',
+            'email' => 'admin@dinsflow.com',
+            'password' => bcrypt('elabsolute10'),
+            'role' => 'dins'
+        ]);
 
-        // \App\Models\User::factory()->create([
-        //     'name' => 'Test User',
-        //     'email' => 'test@example.com',
-        // ]);
+        User::create([
+            'name' => 'Viewer 1',
+            'email' => 'viewer@dinsflow.com',
+            'password' => bcrypt('test1234'),
+            'role' => 'viewer'
+        ]);
     }
 }

@@ -3,6 +3,8 @@
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
+use App\Http\Controllers\AdminController;
+use App\Http\Controllers\ViewerController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -28,4 +30,11 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
+Route::middleware(['auth', 'role:dins'])->group(function () {
+    Route::get('/dashboard', [AdminController::class, 'index'])->name('dashboard');
+});
+
+Route::middleware(['auth', 'role:viewer'])->group(function () {
+    Route::get('/tabungan', [ViewerController::class, 'index'])->name('tabungan');
+});
 require __DIR__.'/auth.php';
