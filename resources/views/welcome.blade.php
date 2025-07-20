@@ -1,19 +1,14 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Laravel</title>
-
-    <link rel="preconnect" href="https://fonts.bunny.net">
-    <link href="https://fonts.bunny.net/css?family=figtree:400,600&display=swap" rel="stylesheet" />
-
-    {{-- Directive Vite --}}
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
-</head>
-<body class="antialiased">
-    <h1 class="text-3xl font-bold underline text-red-500">
-        Hello world!
-    </h1>
-</body>
-</html>
+<x-guest-layout>
+    <div class="min-h-screen flex flex-col justify-center items-center bg-white">
+        <h1 class="text-4xl font-extrabold text-blue-600 mb-4">
+            Selamat Datang di DinsFlow
+        </h1>
+        <p class="text-gray-600 text-lg mb-6">
+            Aplikasi Pribadi dalam membantu Keuangan.
+        </p>
+        <a href="{{ route('login') }}"
+           class="inline-block px-6 py-3 bg-blue-500 text-white font-semibold rounded hover:bg-blue-600 transition">
+            Login Sekarang
+        </a>
+    </div>
+</x-guest-layout>
