@@ -6,6 +6,7 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\TabunganController;
 use App\Http\Controllers\KategoriNamaTabunganController;
 use App\Http\Controllers\KategoriJenisTabunganController;
+use App\Http\Controllers\ViewerController;
 
 // =======================
 // Public Route
@@ -40,9 +41,7 @@ Route::middleware('auth')->group(function () {
 // Viewer Routes
 // =======================
 Route::middleware(['auth', 'role:viewer'])->group(function () {
-    Route::get('/viewer/dashboard', function () {
-        return view('viewer.dashboard');
-    })->name('viewer.dashboard');
+    Route::get('/viewer/dashboard', [ViewerController::class, 'index'])->name('viewer.dashboard');
 });
 
 // =======================
