@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('nama');
             $table->string('jenis'); // contoh: 'donasi', 'tabungan', 'pengeluaran'
-            $table->decimal('jumlah', 12, 2);
+            $table->decimal('nominal', 12, 2);
             $table->text('keterangan')->nullable();
             $table->timestamps();
         });

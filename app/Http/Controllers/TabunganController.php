@@ -32,15 +32,24 @@ class TabunganController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate([
-            'nama' => 'required',
-            'jenis' => 'required',
-            'jumlah' => 'required|numeric',
-            'keterangan' => 'nullable',
+        $validated = $request->validate([
+            'nama' => 'required|string|max:255',
+            'jenis' => 'required|string|max:255',
+            'nominal' => 'required',
+            'keterangan' => 'nullable|string|max:255',
         ]);
 
-        Tabungan::create($request->all());
+        // Hapus titik/koma dari nominal
+        $cleanedNominal = str_replace(['.', ','], '', $validated['nominal']);
 
-        return redirect()->route('tabungan.index')->with('success', 'Data berhasil ditambahkan.');
+        Tabungan::create([
+            'nama' => $validated['nama'],
+            'jenis' => $validated['jenis'],
+            'nominal' => $cleanedNominal,
+            'keterangan' => $validated['keterangan'],
+            // Tambahkan field lain jika perlu
+        ]);
+
+        return redirect()->route('tabungan.index')->with('success', 'Tabungan berhasil ditambahkan.');
     }
 }

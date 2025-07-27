@@ -26,6 +26,8 @@ Route::middleware(['auth'])->get('/tabungan', [TabunganController::class, 'index
 
 // Dashboard Admin (opsional, bisa dijadikan /dashboard juga)
 Route::middleware(['auth', 'role:dins'])->get('/admin/dashboard', [AdminController::class, 'index'])->name('admin.dashboard');
+Route::middleware(['auth', 'role:dins'])->post('/admin/tabungan', [TabunganController::class, 'store'])->name('admin.tabungan.store');
+// Route::middleware(['auth', 'role:dins'])->get('/admin/tabungan', [TabunganController::class, 'create'])->name('admin.tabungan.create');
 
 
 Route::middleware(['auth', 'role:viewer'])->group(function () {
