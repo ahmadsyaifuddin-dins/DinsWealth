@@ -58,24 +58,38 @@
             </div>
 
         </div>
-        <div class="mt-4 flex items-center justify-end space-x-2">
-
+        
+        {{-- Container tombol yang responsif --}}
+        <div class="mt-6 flex flex-col sm:flex-row items-stretch sm:items-center justify-end gap-3">
+            
+            {{-- Tombol Reset --}}
             <a href="{{ route('tabungan.index') }}"
-                class="bg-gray-200 text-gray-800 font-bold py-2 px-4 rounded-lg hover:bg-gray-300 transition-all"> <i
-                    class="fa-solid fa-rotate mr-2"></i> Reset</a>
+                class="flex items-center justify-center px-4 py-2.5 bg-gray-200 text-gray-800 font-medium text-sm rounded-lg hover:bg-gray-300 transition-all duration-200 min-w-[120px]">
+                <i class="fa-solid fa-rotate mr-2 text-sm"></i>
+                <span>Reset</span>
+            </a>
+            
+            {{-- Tombol Filter --}}
             <button type="submit"
-                class="bg-indigo-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-indigo-700 transition-all"> <i
-                    class="fa-solid fa-filter mr-2"></i> Filter
+                class="flex items-center justify-center px-4 py-2.5 bg-indigo-600 text-white font-medium text-sm rounded-lg hover:bg-indigo-700 transition-all duration-200 min-w-[120px]">
+                <i class="fa-solid fa-filter mr-2 text-sm"></i>
+                <span>Filter</span>
             </button>
-            {{-- Tombol Export PDF BARU --}}
+            
+            {{-- Tombol Export PDF --}}
             <button type="button" id="exportPdfBtn"
-                class="bg-red-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-red-600 transition-all"> <i
-                    class="fa-solid fa-file-pdf mr-2"></i> Export PDF</button>
+                class="flex items-center justify-center px-4 py-2.5 bg-red-500 text-white font-medium text-sm rounded-lg hover:bg-red-600 transition-all duration-200 min-w-[120px]">
+                <i class="fa-solid fa-file-pdf mr-2 text-sm"></i>
+                <span>Export PDF</span>
+            </button>
 
-            {{-- Tombol Export Excel BARU --}}
+            {{-- Tombol Export Excel --}}
             <button type="button" id="exportExcelBtn"
-                class="bg-green-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-green-600 transition-all"> <i
-                    class="fa-solid fa-file-excel mr-2"></i>Export Excel</button>
+                class="flex items-center justify-center px-4 py-2.5 bg-green-500 text-white font-medium text-sm rounded-lg hover:bg-green-600 transition-all duration-200 min-w-[120px]">
+                <i class="fa-solid fa-file-excel mr-2 text-sm"></i>
+                <span>Export Excel</span>
+            </button>
+            
         </div>
     </form>
 </div>

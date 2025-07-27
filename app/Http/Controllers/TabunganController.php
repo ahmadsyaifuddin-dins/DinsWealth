@@ -174,11 +174,19 @@ class TabunganController extends Controller
         }
         // =======================================================
 
+        // ===============================================
+        // BAGIAN BARU: HITUNG TOTAL UNTUK DASHBOARD
+        // ===============================================
+        $totalPemasukan = $data->where('kategoriJenis.jenis', 'Pemasukan')->sum('nominal');
+        $totalPengeluaran = $data->where('kategoriJenis.jenis', 'Pengeluaran')->sum('nominal');
+        $saldoAkhir = $totalPemasukan - $totalPengeluaran;
+        // ===============================================
+
         $namaKategori = KategoriNamaTabungan::all();
         $jenisKategori = KategoriJenisTabungan::all();
 
         // Kirim semua data ke view, termasuk data grafik
-        return view('tabungan.index', compact('data', 'user', 'namaKategori', 'jenisKategori', 'chartData'));
+        return view('tabungan.index', compact('data', 'user', 'namaKategori', 'jenisKategori', 'chartData', 'totalPemasukan', 'totalPengeluaran', 'saldoAkhir'));
     }
 
     public function create()
