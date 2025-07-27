@@ -20,16 +20,16 @@
                     <li class="border-b py-2">
                         <div class="flex justify-between items-center">
                             <div>
-                                <p class="font-bold">{{ $item->nama }}</p>
+                                <p class="font-bold">{{ $item->kategoriNama->nama ?? 'Tidak diketahui' }}</p>
                                 <p class="text-sm text-gray-600">Jenis: 
-                                    <span class="{{ $item->jenis == 'pemasukan' ? 'text-green-600' : 'text-red-600' }}">
-                                        {{ ucfirst($item->jenis) }}
+                                    <span class="{{ $item->kategoriJenis?->jenis === 'pemasukan' ? 'text-green-600' : 'text-red-600' }}">
+                                        {{ ucfirst($item->kategoriJenis?->jenis ?? 'Tidak diketahui') }}
                                     </span>
-                                </p>
+                                </p>                                
                                 <p class="text-sm text-gray-600">Keterangan: {{ $item->keterangan ?? '-' }}</p>
                             </div>
                             <div class="text-right">
-                                <p class="text-lg font-semibold {{ $item->jenis == 'pemasukan' ? 'text-green-700' : 'text-red-700' }}">
+                                <p class="text-lg font-semibold {{ $item->kategoriJenis?->jenis === 'pemasukan' ? 'text-green-700' : 'text-red-700' }}">
                                     Rp{{ number_format($item->nominal, 0, ',', '.') }}
                                 </p>
                             </div>
@@ -46,16 +46,16 @@
                         <li class="border-b py-2">
                             <div class="flex justify-between items-center">
                                 <div>
-                                    <p class="font-bold">{{ $item->nama }}</p>
+                                    <p class="font-bold">{{ $item->kategoriNama->nama ?? 'Tidak diketahui' }}</p>
                                     <p class="text-sm text-gray-600">Jenis: 
-                                        <span class="{{ $item->jenis == 'pemasukan' ? 'text-green-600' : 'text-red-600' }}">
-                                            {{ ucfirst($item->jenis) }}
+                                        <span class="{{ $item->kategoriJenis?->jenis === 'pemasukan' ? 'text-green-600' : 'text-red-600' }}">
+                                            {{ ucfirst($item->kategoriJenis?->jenis ?? 'Tidak diketahui') }}
                                         </span>
                                     </p>
                                     <p class="text-sm text-gray-600">Keterangan: {{ $item->keterangan ?? '-' }}</p>
                                 </div>
                                 <div class="text-right">
-                                    <p class="text-lg font-semibold {{ $item->jenis == 'pemasukan' ? 'text-green-700' : 'text-red-700' }}">
+                                    <p class="text-lg font-semibold {{ $item->kategoriJenis?->jenis === 'pemasukan' ? 'text-green-700' : 'text-red-700' }}">
                                         Rp{{ number_format($item->nominal, 0, ',', '.') }}
                                     </p>
                                 </div>

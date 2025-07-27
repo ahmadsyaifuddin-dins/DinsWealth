@@ -20,5 +20,15 @@ class Tabungan extends Model
     public function user()
     {
         return $this->belongsTo(User::class);
-    }   
+    }
+
+    public function kategoriNama()
+    {
+        return $this->belongsTo(KategoriNamaTabungan::class, 'nama'); // kolom 'nama' sekarang foreign key
+    }
+
+    public function kategoriJenis()
+    {
+        return $this->belongsTo(KategoriJenisTabungan::class, 'jenis'); // kolom 'jenis' sekarang foreign key
+    }
 }
