@@ -27,7 +27,6 @@ class TabunganController extends Controller
         $namaKategori = KategoriNamaTabungan::all();
         $jenisKategori = KategoriJenisTabungan::all();
         return view('tabungan.index', compact('data', 'user', 'namaKategori', 'jenisKategori'));
-
     }
 
     public function create()
@@ -39,25 +38,63 @@ class TabunganController extends Controller
 
     public function store(Request $request)
     {
-    $validated = $request->validate([
-        'nama' => 'required|exists:kategori_nama_tabungans,id',
-        'jenis' => 'required|exists:kategori_jenis_tabungans,id',
-        'nominal' => 'required|string', // format-nya akan dibersihkan manual
-        'keterangan' => 'nullable|string|max:255',
-    ]);
+        $validated = $request->validate([
+            'nama' => 'required|exists:kategori_nama_tabungans,id',
+            'jenis' => 'required|exists:kategori_jenis_tabungans,id',
+            'nominal' => 'required|string', // format-nya akan dibersihkan manual
+            'keterangan' => 'nullable|string|max:255',
+        ]);
 
-    // Bersihkan angka nominal dari titik/koma agar bisa disimpan sebagai integer
-    $cleanedNominal = (int) str_replace(['.', ','], '', $validated['nominal']);
+        // Bersihkan angka nominal dari titik/koma agar bisa disimpan sebagai integer
+        $cleanedNominal = (int) str_replace(['.', ','], '', $validated['nominal']);
 
-    Tabungan::create([
-        'nama' => $validated['nama'],         // ini ID kategori nama tabungan
-        'jenis' => $validated['jenis'],       // ini ID kategori jenis tabungan
-        'nominal' => $cleanedNominal,
-        'keterangan' => $validated['keterangan'],
-        'user_id' => auth()->id(),            // supaya tercatat siapa yang nabung
-    ]);
+        Tabungan::create([
+            'nama' => $validated['nama'],         // ini ID kategori nama tabungan
+            'jenis' => $validated['jenis'],       // ini ID kategori jenis tabungan
+            'nominal' => $cleanedNominal,
+            'keterangan' => $validated['keterangan'],
+            'user_id' => auth()->id(),            // supaya tercatat siapa yang nabung
+        ]);
 
-    return redirect()->route('tabungan.index')->with('success', 'Tabungan berhasil ditambahkan.');
-}
+        return redirect()->route('tabungan.index')->with('success', 'Tabungan berhasil ditambahkan.');
+    }
 
+    public function edit($id)
+    {
+        $tabungan = Tabungan::findOrFail($id);
+        $namaKategori = KategoriNamaTabungan::all();
+        $jenisKategori = KategoriJenisTabungan::all();
+
+        return view('tabungan.edit', compact('tabungan', 'namaKategori', 'jenisKategori'));
+    }
+
+    public function update(Request $request, $id)
+    {
+        $validated = $request->validate([
+            'nama' => 'required|exists:kategori_nama_tabungans,id',
+            'jenis' => 'required|exists:kategori_jenis_tabungans,id',
+            'nominal' => 'required|string',
+            'keterangan' => 'nullable|string|max:255',
+        ]);
+
+        $cleanedNominal = (int) str_replace(['.', ','], '', $validated['nominal']);
+
+        $tabungan = Tabungan::findOrFail($id);
+        $tabungan->update([
+            'nama' => $validated['nama'],
+            'jenis' => $validated['jenis'],
+            'nominal' => $cleanedNominal,
+            'keterangan' => $validated['keterangan'],
+        ]);
+
+        return redirect()->route('tabungan.index')->with('success', 'Tabungan berhasil diupdate.');
+    }
+
+    public function destroy($id)
+    {
+        $tabungan = Tabungan::findOrFail($id);
+        $tabungan->delete();
+
+        return redirect()->route('tabungan.index')->with('success', 'Tabungan berhasil dihapus.');
+    }
 }
