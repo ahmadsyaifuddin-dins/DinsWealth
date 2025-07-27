@@ -18,8 +18,8 @@ class KategoriSeeder extends Seeder
         ]);
 
         KategoriJenisTabungan::insert([
-            ['jenis' => 'pemasukan'],
-            ['jenis' => 'pengeluaran']
+            ['jenis' => 'Pemasukan'],
+            ['jenis' => 'Pengeluaran']
         ]);
     }
 }

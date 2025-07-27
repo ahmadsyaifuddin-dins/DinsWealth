@@ -29,16 +29,16 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
-            // Custom redirect berdasarkan role
-    $user = Auth::user();
-    if ($user->role === 'dins') {
-        return redirect()->intended('admin/dashboard');
-    } elseif ($user->role === 'viewer') {
-        return redirect()->intended('tabungan');
-    }
+        // Custom redirect berdasarkan role
+        $user = Auth::user();
+        if ($user->role === 'dins') {
+            return redirect()->intended('admin/dashboard');
+        } elseif ($user->role === 'viewer') {
+            return redirect()->intended('viewer/dashboard');
+        }
 
-    // Default fallback
-    return redirect()->intended('/');
+        // Default fallback
+        return redirect()->intended('/');
     }
 
     /**
