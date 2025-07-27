@@ -63,7 +63,7 @@
         document.getElementById('editTabunganModal').classList.add('hidden');
     }
 
-    {{-- 2. Inisialisasi Grafik --}}
+    // 2. Inisialisasi Grafik
     document.addEventListener('DOMContentLoaded', function() {
         // Ambil data yang sudah diolah dari controller
         const chartData = @json($chartData ?? []);
@@ -141,4 +141,27 @@
             }
         }
     });
+
+    // Logika untuk Tombol Export
+    const exportPdfBtn = document.getElementById('exportPdfBtn');
+    const exportExcelBtn = document.getElementById('exportExcelBtn');
+    const filterForm = document.querySelector('form[action="{{ route('tabungan.index') }}"]');
+
+    function handleExport(exportUrl) {
+        const formData = new FormData(filterForm);
+        const params = new URLSearchParams(formData).toString();
+        window.location.href = `${exportUrl}?${params}`;
+    }
+
+    if (exportPdfBtn) {
+        exportPdfBtn.addEventListener('click', function() {
+            handleExport('{{ route('tabungan.export.pdf') }}');
+        });
+    }
+
+    if (exportExcelBtn) {
+        exportExcelBtn.addEventListener('click', function() {
+            handleExport('{{ route('tabungan.export.excel') }}');
+        });
+    }
 </script>

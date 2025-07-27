@@ -64,8 +64,9 @@ Route::middleware(['auth', 'role:dins'])->group(function () {
 // Universal Tabungan Index (Untuk semua role)
 // =======================
 Route::middleware(['auth'])->get('/tabungan', [TabunganController::class, 'index'])->name('tabungan.index');
-
+Route::get('/tabungan/export/excel', [TabunganController::class, 'exportExcel'])->name('tabungan.export.excel');
+Route::get('/tabungan/export/pdf', [TabunganController::class, 'exportPdf'])->name('tabungan.export.pdf');
 // =======================
 // Auth Routes
 // =======================
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';
