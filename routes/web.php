@@ -54,8 +54,6 @@ Route::middleware(['auth', 'role:dins'])->group(function () {
 
     // Tabungan (CRUD)
     Route::resource('tabungan', TabunganController::class)->names('tabungan');
-    Route::post('/admin/tabungan', [TabunganController::class, 'store'])->name('admin.tabungan.store');
-    // Route::get('/admin/tabungan', [TabunganController::class, 'create'])->name('admin.tabungan.create'); // opsional
 
     // Master Kategori
     Route::resource('kategori-nama-tabungan', KategoriNamaTabunganController::class)->names('kategori.nama');
