@@ -32,9 +32,9 @@ class AuthenticatedSessionController extends Controller
             // Custom redirect berdasarkan role
     $user = Auth::user();
     if ($user->role === 'dins') {
-        return redirect()->intended('/dashboard');
+        return redirect()->intended('admin/dashboard');
     } elseif ($user->role === 'viewer') {
-        return redirect()->intended('/tabungan');
+        return redirect()->intended('tabungan');
     }
 
     // Default fallback
