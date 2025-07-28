@@ -49,7 +49,7 @@
                                         @if($item->kategoriJenis->jenis === 'Pemasukan') <i class="fa-solid fa-arrow-up"></i> @else <i class="fa-solid fa-arrow-down"></i> @endif
                                     </div>
                                     <div>
-                                        <p class="font-semibold text-gray-900">{{ $item->kategoriNama->nama }}</p>
+                                        <p class="font-semibold text-gray-900">{{ $item->kategoriNama?->nama ?? 'Kategori Dihapus' }}</p>
                                         <p class="text-xs text-gray-500">{{ $item->created_at->diffForHumans() }}</p>
                                     </div>
                                 </div>
