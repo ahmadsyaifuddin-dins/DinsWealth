@@ -1,7 +1,7 @@
 <x-app-layout>
     <x-slot name="header">
         <h2 class="text-xl font-semibold leading-tight text-gray-800">
-            👋 Halo, {{ Auth::user()->name }}!
+            Halo, {{ Auth::user()->name }}!
         </h2>
         <p class="text-sm text-gray-500 mt-1">
             Selamat datang kembali. Ini ringkasan keuanganmu.
@@ -55,11 +55,11 @@
                                         @endif
                                     </div>
                                     <div>
-                                        <p class="font-semibold text-gray-900">{{ $item->kategoriNama->nama }}</p>
+                                        <p class="font-semibold text-gray-900">{{ $item->kategoriNama?->nama ?? 'Kategori Dihapus' }}</p>
                                         <p class="text-xs text-gray-500">{{ $item->created_at->diffForHumans() }}</p>
                                     </div>
                                 </div>
-                                <p class="font-bold {{ $item->kategoriJenis->jenis === 'Pemasukan' ? 'text-green-600' : 'text-red-600' }}">
+                                <p class="font-bold {{ $item->kategoriJenis?->jenis === 'Pemasukan' ? 'text-green-600' : 'text-red-600' }}">
                                     {{ $item->kategoriJenis->jenis === 'Pemasukan' ? '+' : '-' }}Rp{{ number_format($item->nominal, 0, ',', '.') }}
                                 </p>
                             </div>

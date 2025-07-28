@@ -13,8 +13,8 @@ class KategoriSeeder extends Seeder
     {
         KategoriNamaTabungan::insert([
             ['nama' => 'Tabungan Bulanan'],
-            ['nama' => 'Dana Darurat'],
-            ['nama' => 'Cicilan']
+            ['nama' => 'Tabungan Seabank'],
+            ['nama' => 'Dana Darurat'], 
         ]);
 
         KategoriJenisTabungan::insert([

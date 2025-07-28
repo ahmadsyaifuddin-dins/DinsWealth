@@ -20,20 +20,7 @@ $user = Auth::user();
                     <x-nav-link :href="route('admin.dashboard')" :active="request()->routeIs('admin.dashboard')">
                         {{ __('Dashboard Admin') }}
                     </x-nav-link>
-                    <x-nav-link :href="route('tabungan.index')" :active="request()->routeIs('tabungan.*')">
-                        {{ __('Tabungan') }}
-                    </x-nav-link>
-                    @elseif(Auth::user()->role === 'viewer')
-                    <x-nav-link :href="route('viewer.dashboard')" :active="request()->routeIs('viewer.dashboard')">
-                        {{ __('Dashboard') }}
-                    </x-nav-link>
-                    <x-nav-link :href="route('tabungan.index')" :active="request()->routeIs('tabungan.index')">
-                        {{ __('Tabungan') }}
-                    </x-nav-link>
-                    @endif
-                </div>
-
-                @if(Auth::user()->role === 'dins')
+                    @if(Auth::user()->role === 'dins')
                 <div class="hidden sm:flex sm:items-center sm:ml-6">
                     <x-dropdown align="left" width="48">
                         <x-slot name="trigger">
@@ -60,6 +47,18 @@ $user = Auth::user();
                     </x-dropdown>
                 </div>
                 @endif
+                    <x-nav-link :href="route('tabungan.index')" :active="request()->routeIs('tabungan.*')">
+                        {{ __('Tabungan') }}
+                    </x-nav-link>
+                    @elseif(Auth::user()->role === 'viewer')
+                    <x-nav-link :href="route('viewer.dashboard')" :active="request()->routeIs('viewer.dashboard')">
+                        {{ __('Dashboard') }}
+                    </x-nav-link>
+                    <x-nav-link :href="route('tabungan.index')" :active="request()->routeIs('tabungan.index')">
+                        {{ __('Tabungan') }}
+                    </x-nav-link>
+                    @endif
+                </div>
             </div>
 
             <!-- Settings Dropdown -->
@@ -116,10 +115,7 @@ $user = Auth::user();
             <x-responsive-nav-link :href="route('admin.dashboard')" :active="request()->routeIs('admin.dashboard')">
                 {{ __('Dashboard Admin') }}
             </x-responsive-nav-link>
-            <x-responsive-nav-link :href="route('tabungan.index')" :active="request()->routeIs('tabungan.*')">
-                {{ __('Tabungan') }}
-            </x-responsive-nav-link>
-            
+
             <!-- Master Kategori Dropdown for Mobile -->
             <div class="px-4 pt-2">
                 <button @click="masterDropdownOpen = !masterDropdownOpen" 
@@ -147,6 +143,10 @@ $user = Auth::user();
                     </x-responsive-nav-link>
                 </div>
             </div>
+
+            <x-responsive-nav-link :href="route('tabungan.index')" :active="request()->routeIs('tabungan.*')">
+                {{ __('Tabungan') }}
+            </x-responsive-nav-link>
             
             @elseif(Auth::user()->role === 'viewer')
             <x-responsive-nav-link :href="route('viewer.dashboard')" :active="request()->routeIs('viewer.dashboard')">
