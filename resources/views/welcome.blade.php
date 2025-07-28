@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DinsFlow - Kelola Keuangan Pribadi</title>
+    <title>DinsWealth - Kelola Keuangan Pribadi</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <script>
         tailwind.config = {
@@ -74,12 +74,12 @@
         <div class="text-center max-w-4xl mx-auto animate-slide-up">
             <!-- Logo/Icon -->
             <div class="flex items-center justify-center">
-                <img src="{{ asset('icon_dinsflow.png') }}" alt="Logo DinsFlow" class="w-28 h-28">
+                <img src="{{ asset('icon_DinsWealth.png') }}" alt="Logo DinsWealth" class="w-28 h-28">
             </div>
 
             <!-- Main title -->
             <h1 class="text-6xl md:text-7xl font-black bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 bg-clip-text text-transparent mb-6 animate-fade-in" style="animation-delay: 0.4s;">
-                DinsFlow
+                DinsWealth
             </h1>
 
             <!-- Subtitle -->
