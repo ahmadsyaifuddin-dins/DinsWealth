@@ -10,9 +10,15 @@
             <h4 class="text-lg font-semibold text-gray-700 mb-2 text-center">Top 5 Kategori Pengeluaran</h4>
             <canvas id="barChart"></canvas>
         </div>
-
         <div class="bg-white rounded-2xl shadow-lg p-6 lg:col-span-2">
-            <h4 class="text-lg font-semibold text-gray-700 mb-2 text-center">Riwayat Arus Kas Bulanan</h4>
+            <div class="flex justify-between items-center mb-2">
+                <h4 class="text-lg font-semibold text-gray-700">Riwayat Arus Kas</h4>
+                <div class="flex space-x-1 bg-gray-200 p-1 rounded-lg">
+                    <button id="lineChartHourlyBtn" class="px-3 py-1 text-sm font-semibold rounded-md text-gray-600">Per Jam</button>
+                    <button id="lineChartDailyBtn" class="px-3 py-1 text-sm font-semibold rounded-md bg-white text-indigo-600 shadow">Harian</button>
+                    <button id="lineChartMonthlyBtn" class="px-3 py-1 text-sm font-semibold rounded-md text-gray-600">Bulanan</button>
+                </div>
+            </div>
             <canvas id="lineChart"></canvas>
         </div>
     </div>

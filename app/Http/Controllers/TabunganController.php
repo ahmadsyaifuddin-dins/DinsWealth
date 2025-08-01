@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Barryvdh\DomPDF\Facade\Pdf;
 use App\Exports\TabunganExport;
+use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Facades\Excel;
 
 class TabunganController extends Controller
@@ -85,108 +86,96 @@ class TabunganController extends Controller
 
     public function index(Request $request)
     {
+        // =================================================================
+        // 1. DATA UNTUK TABEL & TOTAL (SESUAI FILTER DARI USER) - Tetap sama
+        // =================================================================
         $data = $this->getFilteredQuery($request)->get();
         $user = Auth::user();
-
-        // Mulai query dasar
-        $query = Tabungan::with(['user', 'kategoriNama', 'kategoriJenis']);
-
-        // Terapkan filter berdasarkan input dari request (URL)
-
-        // 1. Filter berdasarkan rentang tanggal
-        if ($request->filled('tanggal_mulai')) {
-            // Gunakan kolom 'created_at' yang ada di database kamu
-            $query->whereDate('created_at', '>=', $request->tanggal_mulai);
-        }
-        if ($request->filled('tanggal_selesai')) {
-            // Gunakan kolom 'created_at' yang ada di database kamu
-            $query->whereDate('created_at', '<=', $request->tanggal_selesai);
-        }
-
-        // 2. Filter berdasarkan jenis (ID dari kategori jenis)
-        if ($request->filled('jenis')) {
-            $query->where('jenis', $request->jenis);
-        }
-
-        // 3. Filter berdasarkan kategori (ID dari kategori nama)
-        if ($request->filled('kategori')) {
-            $query->where('nama', $request->kategori);
-        }
-
-        // 4. Filter berdasarkan kata kunci di keterangan
-        if ($request->filled('search')) {
-            $search = $request->search;
-            $query->where('keterangan', 'like', "%{$search}%");
-        }
-
-        // Terapkan aturan role SETELAH semua filter diterapkan
-        // if ($user->role === 'dins') {
-        //     // Dins bisa lihat semua data (yang sudah difilter)
-        // } elseif ($user->role === 'viewer') {
-        //     // Viewer hanya bisa lihat datanya sendiri (yang sudah difilter)
-        //     $query->where('user_id', $user->id);
-        // } else {
-        //     abort(403);
-        // }
-
-        // Ambil data SETELAH semua kondisi diterapkan
-        $data = $query->latest()->get();
-
-        // =======================================================
-        // PERSIAPAN DATA UNTUK GRAFIK (BAGIAN BARU)
-        // =======================================================
-        $chartData = [];
-        if ($data->isNotEmpty()) {
-            // 1. Data untuk Pie Chart (Pemasukan vs Pengeluaran)
-            $totalPemasukan = $data->where('kategoriJenis.jenis', 'Pemasukan')->sum('nominal');
-            $totalPengeluaran = $data->where('kategoriJenis.jenis', 'Pengeluaran')->sum('nominal');
-            $chartData['pie'] = [$totalPemasukan, $totalPengeluaran];
-
-            // 2. Data untuk Line Chart (Riwayat per bulan)
-            $lineChartData = $data->sortBy('created_at')
-                ->groupBy(function ($item) {
-                    return $item->created_at->format('Y-m'); // Grup berdasarkan Tahun-Bulan
-                })
-                ->map(function ($group) {
-                    $pemasukan = $group->where('kategoriJenis.jenis', 'Pemasukan')->sum('nominal');
-                    $pengeluaran = $group->where('kategoriJenis.jenis', 'Pengeluaran')->sum('nominal');
-                    return $pemasukan - $pengeluaran; // Hitung arus kas bersih
-                });
-
-            $chartData['line'] = [
-                'labels' => $lineChartData->keys()->map(function ($date) {
-                    // Format label menjadi "Nama Bulan Tahun"
-                    return \Carbon\Carbon::createFromFormat('Y-m', $date)->isoFormat('MMMM Y');
-                }),
-                'data' => $lineChartData->values(),
-            ];
-
-            // 3. Data untuk Bar Chart (Kategori paling sering)
-            $barChartData = $data->where('kategoriJenis.jenis', 'Pengeluaran') // Fokus pada pengeluaran
-                ->countBy('kategoriNama.nama')
-                ->sortDesc()
-                ->take(5); // Ambil 5 teratas
-
-            $chartData['bar'] = [
-                'labels' => $barChartData->keys(),
-                'data' => $barChartData->values(),
-            ];
-        }
-        // =======================================================
-
-        // ===============================================
-        // BAGIAN BARU: HITUNG TOTAL UNTUK DASHBOARD
-        // ===============================================
         $totalPemasukan = $data->where('kategoriJenis.jenis', 'Pemasukan')->sum('nominal');
         $totalPengeluaran = $data->where('kategoriJenis.jenis', 'Pengeluaran')->sum('nominal');
         $saldoAkhir = $totalPemasukan - $totalPengeluaran;
-        // ===============================================
 
+        // =================================================================
+        // 2. AMBIL DATA KHUSUS UNTUK GRAFIK (QUERY DIPERBARUI & LEBIH STABIL)
+        // =================================================================
+        $chartData = [];
+
+        // Data untuk Pie Chart (menggunakan JOIN)
+        $pieData = Tabungan::select(
+            'kategori_jenis_tabungans.jenis',
+            DB::raw('SUM(tabungans.nominal) as total_nominal')
+        )
+            ->join('kategori_jenis_tabungans', 'tabungans.jenis', '=', 'kategori_jenis_tabungans.id')
+            ->groupBy('kategori_jenis_tabungans.jenis')
+            ->pluck('total_nominal', 'jenis');
+
+        $chartData['pie'] = [
+            $pieData->get('Pemasukan', 0),
+            $pieData->get('Pengeluaran', 0)
+        ];
+
+        // Data untuk Bar Chart (menggunakan JOIN)
+        $barChartData = Tabungan::select(
+            'kategori_nama_tabungans.nama',
+            DB::raw('COUNT(*) as total_transaksi')
+        )
+            ->join('kategori_jenis_tabungans', 'tabungans.jenis', '=', 'kategori_jenis_tabungans.id')
+            ->join('kategori_nama_tabungans', 'tabungans.nama', '=', 'kategori_nama_tabungans.id')
+            ->where('kategori_jenis_tabungans.jenis', 'Pengeluaran')
+            ->groupBy('kategori_nama_tabungans.nama')
+            ->orderBy('total_transaksi', 'desc')
+            ->take(5)
+            ->pluck('total_transaksi', 'nama');
+
+        $chartData['bar'] = [
+            'labels' => $barChartData->keys(),
+            'data'   => $barChartData->values(),
+        ];
+
+        // Data untuk Line Chart (Bulanan - selectRaw sudah stabil)
+        $lineChartBulanan = Tabungan::selectRaw("DATE_FORMAT(created_at, '%Y-%m') as month, SUM(CASE WHEN jenis = (SELECT id FROM kategori_jenis_tabungans WHERE jenis = 'Pemasukan') THEN nominal ELSE -nominal END) as net_flow")
+            ->groupBy('month')->orderBy('month', 'asc')->get();
+        $chartData['line_monthly'] = [
+            'labels' => $lineChartBulanan->map(fn($item) => \Carbon\Carbon::createFromFormat('Y-m', $item->month)->isoFormat('MMMM Y')),
+            'data'   => $lineChartBulanan->pluck('net_flow'),
+        ];
+
+        // Data untuk Line Chart (Harian - selectRaw sudah stabil)
+        $lineChartHarian = Tabungan::selectRaw("DATE(created_at) as day, SUM(CASE WHEN jenis = (SELECT id FROM kategori_jenis_tabungans WHERE jenis = 'Pemasukan') THEN nominal ELSE -nominal END) as net_flow")
+            ->where('created_at', '>=', now()->subDays(29)->startOfDay())->groupBy('day')->orderBy('day', 'asc')->get();
+        $chartData['line_daily'] = [
+            'labels' => $lineChartHarian->map(fn($item) => \Carbon\Carbon::parse($item->day)->isoFormat('D MMM')),
+            'data'   => $lineChartHarian->pluck('net_flow'),
+        ];
+
+        // Data untuk Line Chart (Per Jam - selectRaw sudah stabil)
+        $hourlyFlows = Tabungan::selectRaw("HOUR(created_at) as hour, SUM(CASE WHEN jenis = (SELECT id FROM kategori_jenis_tabungans WHERE jenis = 'Pemasukan') THEN nominal ELSE -nominal END) as net_flow")
+            ->whereDate('created_at', today())->groupBy('hour')->orderBy('hour', 'asc')->pluck('net_flow', 'hour');
+        $hourlyData = array_fill(0, 24, 0);
+        foreach ($hourlyFlows as $hour => $net_flow) {
+            $hourlyData[$hour] = $net_flow;
+        }
+        $chartData['line_hourly'] = [
+            'labels' => array_map(fn($h) => str_pad($h, 2, '0', STR_PAD_LEFT) . ':00', array_keys($hourlyData)),
+            'data'   => array_values($hourlyData),
+        ];
+
+        // =================================================================
+        // 3. AMBIL DATA UNTUK DROPDOWN & KIRIM KE VIEW
+        // =================================================================
         $namaKategori = KategoriNamaTabungan::all();
         $jenisKategori = KategoriJenisTabungan::all();
 
-        // Kirim semua data ke view, termasuk data grafik
-        return view('tabungan.index', compact('data', 'user', 'namaKategori', 'jenisKategori', 'chartData', 'totalPemasukan', 'totalPengeluaran', 'saldoAkhir'));
+        return view('tabungan.index', compact(
+            'data',
+            'user',
+            'namaKategori',
+            'jenisKategori',
+            'chartData',
+            'totalPemasukan',
+            'totalPengeluaran',
+            'saldoAkhir'
+        ));
     }
 
     public function create()
