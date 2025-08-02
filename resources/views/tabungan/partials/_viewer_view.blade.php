@@ -48,11 +48,26 @@
                             <h4 class="font-bold text-lg md:text-xl text-gray-800 break-words">
                                 {{ $item->kategoriNama->nama ?? 'Tidak diketahui' }}
                             </h4>
-                            <div class="flex items-center mt-1">
+                            <div class="flex flex-col sm:flex-row sm:items-center sm:space-x-3 mt-1 space-y-1 sm:space-y-0">
                                 <span
                                     class="inline-flex items-center px-2 md:px-2.5 py-0.5 rounded-full text-xs font-medium {{ $item->kategoriJenis?->jenis === 'Pemasukan' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' }}">
                                     {{ ucfirst($item->kategoriJenis?->jenis ?? 'Tidak diketahui') }}
                                 </span>
+                                <!-- Tanggal dan Waktu -->
+                                <div class="flex items-center text-xs text-gray-500 space-x-2">
+                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z">
+                                        </path>
+                                    </svg>
+                                    <span>{{ \Carbon\Carbon::parse($item->created_at)->format('d M Y') }}</span>
+                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z">
+                                        </path>
+                                    </svg>
+                                    <span>{{ \Carbon\Carbon::parse($item->created_at)->format('H:i') }}</span>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -71,6 +86,12 @@
                         {{ $item->kategoriJenis?->jenis === 'Pemasukan' ? '+' : '-' }}Rp{{
                         number_format($item->nominal, 0, ',', '.') }}
                     </p>
+                    <!-- Tanggal dan Waktu di bawah nominal (untuk tampilan mobile) -->
+                    <div class="md:hidden mt-2">
+                        <p class="text-xs text-gray-500">
+                            {{ \Carbon\Carbon::parse($item->created_at)->format('d M Y, H:i') }}
+                        </p>
+                    </div>
                     <div
                         class="w-12 md:w-16 h-1 {{ $item->kategoriJenis?->jenis === 'Pemasukan' ? 'bg-green-400' : 'bg-red-400' }} rounded-full mt-2 mx-auto md:ml-auto">
                     </div>
