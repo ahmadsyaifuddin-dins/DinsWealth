@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\BackupController;
 use App\Http\Controllers\TabunganController;
 use App\Http\Controllers\KategoriNamaTabunganController;
 use App\Http\Controllers\KategoriJenisTabunganController;
@@ -54,6 +55,9 @@ Route::middleware(['auth', 'role:dins'])->group(function () {
     // Tabungan (CRUD)
     Route::resource('tabungan', TabunganController::class)->names('tabungan');
 
+    Route::get('/backup', [BackupController::class, 'index'])->name('backup.index');
+    Route::post('/backup/download', [BackupController::class, 'download'])->name('backup.download');
+    
     // Master Kategori
     Route::resource('kategori-nama-tabungan', KategoriNamaTabunganController::class)->names('kategori.nama');
     Route::resource('kategori-jenis-tabungan', KategoriJenisTabunganController::class)->names('kategori.jenis');

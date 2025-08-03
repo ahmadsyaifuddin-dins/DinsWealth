@@ -68,7 +68,7 @@
                 <i class="fa-solid fa-rotate mr-2 text-sm"></i>
                 <span>Reset</span>
             </a>
-            
+
             {{-- Tombol Filter --}}
             <button type="submit"
                 class="flex items-center justify-center px-4 py-2.5 bg-indigo-600 text-white font-medium text-sm rounded-lg hover:bg-indigo-700 transition-all duration-200 min-w-[120px]">
