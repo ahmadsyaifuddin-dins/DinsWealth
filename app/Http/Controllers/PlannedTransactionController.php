@@ -10,13 +10,55 @@ use Illuminate\Http\Request;
 
 class PlannedTransactionController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $plannedTransactions = PlannedTransaction::with(['kategoriNama', 'kategoriJenis'])
-            ->where('user_id', auth()->id())
-            ->latest()
-            ->paginate(10);
+        // Validate filter inputs
+        $request->validate([
+            'search' => 'nullable|string|max:255',
+            'nama' => 'nullable|exists:kategori_nama_tabungans,id',
+            'jenis' => 'nullable|exists:kategori_jenis_tabungans,id',
+            'status' => 'nullable|in:pending,done',
+            'jatuh_tempo_start' => 'nullable|date',
+            'jatuh_tempo_end' => 'nullable|date|after_or_equal:jatuh_tempo_start',
+        ]);
 
+        $query = PlannedTransaction::query()->where('user_id', auth()->id());
+
+        // Filter by search (keterangan)
+        if ($request->filled('search')) {
+            $query->where('keterangan', 'like', '%' . trim($request->search) . '%');
+        }
+
+        // Filter by nama
+        if ($request->filled('nama')) {
+            $query->where('nama', $request->nama);
+        }
+
+        // Filter by jenis
+        if ($request->filled('jenis')) {
+            $query->where('jenis', $request->jenis);
+        }
+
+        // Filter by status
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+
+        // Filter by jatuh_tempo range
+        if ($request->filled('jatuh_tempo_start')) {
+            $query->whereDate('jatuh_tempo', '>=', $request->jatuh_tempo_start);
+        }
+        if ($request->filled('jatuh_tempo_end')) {
+            $query->whereDate('jatuh_tempo', '<=', $request->jatuh_tempo_end);
+        }
+
+        // Eager load relationships
+        $query->with(['kategoriNama', 'kategoriJenis']);
+
+        // Paginate results
+        $plannedTransactions = $query->latest()->paginate(10)->appends($request->query());
+
+        // Load categories for other views
         $namaKategori = KategoriNamaTabungan::all();
         $jenisKategori = KategoriJenisTabungan::all();
 
@@ -35,7 +77,7 @@ class PlannedTransactionController extends Controller
         $validated = $request->validate([
             'nama' => 'required|exists:kategori_nama_tabungans,id',
             'jenis' => 'required|exists:kategori_jenis_tabungans,id',
-            'nominal' => 'required|numeric|min:0', // Validasi nilai nominal yang sudah bersih
+            'nominal' => 'required|numeric|min:0',
             'keterangan' => 'required|string|max:255',
             'jatuh_tempo' => 'required|date',
         ]);
@@ -46,10 +88,8 @@ class PlannedTransactionController extends Controller
         return redirect()->route('planned-transactions.index')->with('success', 'Rencana transaksi berhasil ditambahkan.');
     }
 
-
     public function edit(PlannedTransaction $plannedTransaction)
     {
-        // Cek apakah user adalah pemilik data
         if ($plannedTransaction->user_id !== auth()->id()) {
             abort(403, 'Akses ditolak. Anda hanya bisa mengedit data Anda sendiri.');
         }
@@ -61,7 +101,6 @@ class PlannedTransactionController extends Controller
 
     public function update(Request $request, PlannedTransaction $plannedTransaction)
     {
-        // Cek apakah user adalah pemilik data
         if ($plannedTransaction->user_id !== auth()->id()) {
             abort(403, 'Akses ditolak. Anda hanya bisa mengupdate data Anda sendiri.');
         }
@@ -82,7 +121,6 @@ class PlannedTransactionController extends Controller
 
     public function destroy(PlannedTransaction $plannedTransaction)
     {
-        // Cek apakah user adalah pemilik data
         if ($plannedTransaction->user_id !== auth()->id()) {
             abort(403, 'Akses ditolak. Anda hanya bisa menghapus data Anda sendiri.');
         }
@@ -93,14 +131,12 @@ class PlannedTransactionController extends Controller
 
     public function complete(Request $request, PlannedTransaction $plannedTransaction)
     {
-        // Cek apakah user adalah pemilik data
         if ($plannedTransaction->user_id !== auth()->id()) {
             abort(403, 'Akses ditolak. Anda hanya bisa menyelesaikan rencana Anda sendiri.');
         }
 
         $request->validate(['tanggal_peristiwa' => 'required|date']);
 
-        // 1. Buat transaksi baru di tabel 'tabungans'
         Tabungan::create([
             'nama' => $plannedTransaction->nama,
             'jenis' => $plannedTransaction->jenis,
@@ -111,7 +147,6 @@ class PlannedTransactionController extends Controller
             'updated_at' => $request->tanggal_peristiwa,
         ]);
 
-        // 2. Update status rencana menjadi 'done'
         $plannedTransaction->update([
             'status' => 'done',
             'tanggal_peristiwa' => $request->tanggal_peristiwa,

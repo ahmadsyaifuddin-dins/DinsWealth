@@ -1,19 +1,22 @@
 <x-app-layout>
     <x-slot name="header">
         <h2 class="text-xl font-semibold leading-tight text-gray-800">
-            🗓️ Transaksi Terencana
+            <i class="fa-solid fa-calendar-check mr-2 text-green-700"></i>
+            Transaksi Terencana
         </h2>
     </x-slot>
 
     <div class="py-12">
         @include('includes.messages')
         <div class="mx-auto max-w-7xl sm:px-6 lg:px-8">
+            
             {{-- Tombol untuk membuka modal "Tambah Rencana" --}}
             <div class="mb-6 text-right">
                 <button onclick="openCreateModal()" class="inline-flex items-center px-4 py-2 bg-indigo-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-700 active:bg-indigo-900 focus:outline-none focus:border-indigo-900 focus:ring ring-indigo-300 disabled:opacity-25 transition ease-in-out duration-150">
                     + Tambah Rencana
                 </button>
             </div>
+            @include('planned-transactions.partials._filters')
 
             {{-- Tabel untuk menampilkan daftar transaksi terencana --}}
             <div class="overflow-hidden bg-white shadow-sm sm:rounded-lg">
