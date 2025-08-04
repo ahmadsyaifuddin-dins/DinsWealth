@@ -7,6 +7,7 @@ use App\Http\Controllers\BackupController;
 use App\Http\Controllers\TabunganController;
 use App\Http\Controllers\KategoriNamaTabunganController;
 use App\Http\Controllers\KategoriJenisTabunganController;
+use App\Http\Controllers\PlannedTransactionController;
 use App\Http\Controllers\ViewerController;
 
 // =======================
@@ -55,9 +56,14 @@ Route::middleware(['auth', 'role:dins'])->group(function () {
     // Tabungan (CRUD)
     Route::resource('tabungan', TabunganController::class)->names('tabungan');
 
+    // Backup
     Route::get('/backup', [BackupController::class, 'index'])->name('backup.index');
     Route::post('/backup/download', [BackupController::class, 'download'])->name('backup.download');
-    
+
+    // Planned Transaction (CRUD)
+    Route::resource('planned-transactions', PlannedTransactionController::class);
+    Route::post('/planned-transactions/{plannedTransaction}/complete', [PlannedTransactionController::class, 'complete'])->name('planned-transactions.complete');
+
     // Master Kategori
     Route::resource('kategori-nama-tabungan', KategoriNamaTabunganController::class)->names('kategori.nama');
     Route::resource('kategori-jenis-tabungan', KategoriJenisTabunganController::class)->names('kategori.jenis');

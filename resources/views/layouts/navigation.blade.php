@@ -58,6 +58,11 @@ $user = Auth::user();
                         {{ __('Tabungan') }}
                     </x-nav-link>
                     @endif
+                    @if(Auth::user()->role === 'dins')
+                    <x-nav-link :href="route('planned-transactions.index')" :active="request()->routeIs('planned-transactions.*')">
+                        {{ __('Transaksi Terencana') }}
+                    </x-nav-link>
+                    @endif
                 </div>
             </div>
 
@@ -147,6 +152,11 @@ $user = Auth::user();
             <x-responsive-nav-link :href="route('tabungan.index')" :active="request()->routeIs('tabungan.*')">
                 {{ __('Tabungan') }}
             </x-responsive-nav-link>
+            @if(Auth::user()->role === 'dins')
+            <x-responsive-nav-link :href="route('planned-transactions.index')" :active="request()->routeIs('planned-transactions.*')">
+                {{ __('Transaksi Terencana') }}
+            </x-responsive-nav-link>
+            @endif
             
             @elseif(Auth::user()->role === 'viewer')
             <x-responsive-nav-link :href="route('viewer.dashboard')" :active="request()->routeIs('viewer.dashboard')">
