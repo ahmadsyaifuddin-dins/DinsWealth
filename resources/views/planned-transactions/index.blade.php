@@ -5,7 +5,6 @@
         </h2>
     </x-slot>
 
-    
     <div class="py-12">
         @include('includes.messages')
         <div class="mx-auto max-w-7xl sm:px-6 lg:px-8">
@@ -34,8 +33,20 @@
                                 @forelse ($plannedTransactions as $item)
                                     <tr>
                                         <td class="px-6 py-4 whitespace-nowrap">
-                                            <div class="text-sm font-medium text-gray-900">{{ $item->keterangan }}</div>
-                                            <div class="text-xs text-gray-500">{{ $item->kategoriNama?->nama ?? 'N/A' }} | <span class="{{ $item->kategoriJenis?->jenis === 'Pemasukan' ? 'text-green-600' : 'text-red-600' }}">{{ $item->kategoriJenis?->jenis ?? 'N/A' }}</span></div>
+                                            <div class="text-sm font-medium text-gray-900" title="{{ $item->keterangan }}">
+                                                {{ \Illuminate\Support\Str::limit($item->keterangan, 50, '...') }}
+                                                @if (strlen($item->keterangan) > 50)
+                                                    <button onclick='openReadMoreModal(@json($item))' class="text-indigo-600 hover:text-indigo-900 text-xs underline ml-2">
+                                                        Read More
+                                                    </button>
+                                                @endif
+                                            </div>
+                                            <div class="text-xs text-gray-500">
+                                                {{ $item->kategoriNama?->nama ?? 'N/A' }} | 
+                                                <span class="{{ $item->kategoriJenis?->jenis === 'Pemasukan' ? 'text-green-600' : 'text-red-600' }}">
+                                                    {{ $item->kategoriJenis?->jenis ?? 'N/A' }}
+                                                </span>
+                                            </div>
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap">
                                             <div class="text-sm text-gray-900">Rp{{ number_format($item->nominal, 0, ',', '.') }}</div>
@@ -57,12 +68,10 @@
                                                     <button onclick='openCompleteModal(@json($item))' title="Selesaikan" class="text-green-600 hover:text-green-900 transition-colors">
                                                         <i class="fa-solid fa-check-circle fa-lg"></i>
                                                     </button>
-                                                    
                                                     {{-- Tombol Edit --}}
                                                     <button onclick='openEditModal(@json($item))' title="Edit" class="text-indigo-600 hover:text-indigo-900 transition-colors">
                                                         <i class="fa-solid fa-pen-to-square fa-lg"></i>
                                                     </button>
-                                                    
                                                     {{-- Tombol Hapus --}}
                                                     <form action="{{ route('planned-transactions.destroy', $item) }}" method="POST" onsubmit="return confirm('Yakin ingin menghapus rencana ini?')">
                                                         @csrf
@@ -73,7 +82,7 @@
                                                     </form>
                                                 </div>
                                             @else
-                                               -
+                                                -
                                             @endif
                                         </td>
                                     </tr>

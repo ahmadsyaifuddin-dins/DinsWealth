@@ -164,4 +164,14 @@ function openCompleteModal(item) {
 function closeCompleteModal() { 
     completeModal.classList.add('hidden'); 
 }
+
+function openReadMoreModal(item) {
+    document.getElementById('readMoreDescription').textContent = item.keterangan;
+    document.getElementById('readMoreModal').classList.remove('hidden');
+}
+
+function closeReadMoreModal() {
+    document.getElementById('readMoreModal').classList.add('hidden');
+    document.getElementById('readMoreDescription').textContent = '';
+}
 </script>
