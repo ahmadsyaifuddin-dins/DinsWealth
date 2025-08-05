@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\SoftDeletes; // <-- 1. Tambahkan use statement
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Tabungan extends Model
 {
@@ -16,6 +16,11 @@ class Tabungan extends Model
         'jenis',
         'nominal',
         'keterangan',
+    ];
+
+    protected $casts = [
+        'nominal' => 'decimal:2',
+        'deleted_at' => 'datetime'
     ];
 
     public function user()
@@ -31,5 +36,11 @@ class Tabungan extends Model
     public function kategoriJenis()
     {
         return $this->belongsTo(KategoriJenisTabungan::class, 'jenis'); // kolom 'jenis' sekarang foreign key
+    }
+
+    // Accessor untuk format nominal
+    public function getFormattedNominalAttribute()
+    {
+        return 'Rp ' . number_format($this->nominal, 0, ',', '.');
     }
 }

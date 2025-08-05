@@ -178,6 +178,18 @@ class TabunganController extends Controller
         ));
     }
 
+      /**
+     * TAMBAHKAN METHOD SHOW YANG HILANG
+     * Method ini diperlukan jika menggunakan resource route
+     */
+    // public function show(Tabungan $tabungan)
+    // {
+    //     // Load relasi yang diperlukan
+    //     $tabungan->load(['kategoriNama', 'kategoriJenis', 'user']);
+        
+    //     return view('tabungan.show', compact('tabungan'));
+    // }
+
     public function create()
     {
         $namaKategori = KategoriNamaTabungan::all();
@@ -239,11 +251,111 @@ class TabunganController extends Controller
         return redirect()->route('tabungan.index')->with('success', 'Tabungan berhasil diupdate.');
     }
 
-    public function destroy($id)
+    /**
+     * Soft delete tabungan (hanya untuk role dins)
+     */
+    public function destroy(Tabungan $tabungan)
     {
-        $tabungan = Tabungan::findOrFail($id);
-        $tabungan->delete();
+        // Cek apakah user memiliki role dins
+        if (Auth::user()->role !== 'dins') {
+            return redirect()->route('tabungan.index')
+                ->with('error', 'Anda tidak memiliki akses untuk menghapus data tabungan!');
+        }
 
-        return redirect()->route('tabungan.index')->with('success', 'Tabungan berhasil dihapus.');
+        $tabungan->delete(); // Soft delete
+
+        return redirect()->route('tabungan.index')
+            ->with('success', 'Data tabungan berhasil dihapus! Data dapat dipulihkan dari menu sampah.');
+    }
+
+    /**
+     * Tampilkan halaman recycle bin / sampah tabungan
+     */
+    public function trash()
+    {
+        // Cek apakah user memiliki role dins
+        if (Auth::user()->role !== 'dins') {
+            return redirect()->route('tabungan.index')
+                ->with('error', 'Anda tidak memiliki akses untuk melihat sampah tabungan!');
+        }
+
+        $trashedTabungans = Tabungan::onlyTrashed()
+            ->with(['kategoriNama', 'kategoriJenis'])
+            ->orderBy('deleted_at', 'desc')
+            ->paginate(10);
+
+        return view('tabungan.trash', compact('trashedTabungans'));
+    }
+
+    /**
+     * Pulihkan data tabungan dari sampah
+     */
+    public function restore($id)
+    {
+        // Cek apakah user memiliki role dins
+        if (Auth::user()->role !== 'dins') {
+            return redirect()->route('tabungan.index')
+                ->with('error', 'Anda tidak memiliki akses untuk memulihkan data tabungan!');
+        }
+
+        $tabungan = Tabungan::onlyTrashed()->findOrFail($id);
+        $tabungan->restore();
+
+        return redirect()->route('tabungan.trash')
+            ->with('success', 'Data tabungan berhasil dipulihkan!');
+    }
+
+    /**
+     * Hapus permanen data tabungan dari database
+     */
+    public function forceDelete($id)
+    {
+        // Cek apakah user memiliki role dins
+        if (Auth::user()->role !== 'dins') {
+            return redirect()->route('tabungan.index')
+                ->with('error', 'Anda tidak memiliki akses untuk menghapus permanen data tabungan!');
+        }
+
+        $tabungan = Tabungan::onlyTrashed()->findOrFail($id);
+        $tabungan->forceDelete();
+
+        return redirect()->route('tabungan.trash')
+            ->with('success', 'Data tabungan berhasil dihapus permanen dari database!');
+    }
+
+    /**
+     * Pulihkan semua data tabungan dari sampah
+     */
+    public function restoreAll()
+    {
+        // Cek apakah user memiliki role dins
+        if (Auth::user()->role !== 'dins') {
+            return redirect()->route('tabungan.index')
+                ->with('error', 'Anda tidak memiliki akses untuk memulihkan data tabungan!');
+        }
+
+        $count = Tabungan::onlyTrashed()->count();
+        Tabungan::onlyTrashed()->restore();
+
+        return redirect()->route('tabungan.trash')
+            ->with('success', "Berhasil memulihkan {$count} data tabungan!");
+    }
+
+    /**
+     * Hapus permanen semua data tabungan dari sampah
+     */
+    public function emptyTrash()
+    {
+        // Cek apakah user memiliki role dins
+        if (Auth::user()->role !== 'dins') {
+            return redirect()->route('tabungan.index')
+                ->with('error', 'Anda tidak memiliki akses untuk mengosongkan sampah tabungan!');
+        }
+
+        $count = Tabungan::onlyTrashed()->count();
+        Tabungan::onlyTrashed()->forceDelete();
+
+        return redirect()->route('tabungan.trash')
+            ->with('success', "Berhasil menghapus permanen {$count} data tabungan dari database!");
     }
 }
