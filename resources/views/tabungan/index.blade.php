@@ -63,6 +63,6 @@
     @include('tabungan.partials._scripts')
     @endpush
 
-    @include('components.modal-tabungan')
-    @include('components.modal-tabungan-edit')
+    @include('tabungan.partials.modal-tabungan')
+    @include('tabungan.partials.modal-tabungan-edit')
 </x-app-layout>
