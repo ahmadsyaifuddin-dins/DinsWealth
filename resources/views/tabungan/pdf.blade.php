@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Laporan Keuangan</title>
+    <title>Laporan Keuangan Dins</title>
     <style>
         /* CSS untuk tampilan laporan yang lebih profesional */
         :root {
@@ -19,7 +19,7 @@
         }
         .header {
             text-align: center;
-            margin-bottom: 25px;
+            margin-bottom: 30px;
         }
         .header h1 {
             color: var(--primary-color);
@@ -34,21 +34,44 @@
         table {
             width: 100%;
             border-collapse: collapse;
-            margin-bottom: 20px;
+            margin-bottom: 25px;
         }
         table thead th {
             background-color: var(--primary-color);
             color: white;
-            padding: 10px;
+            padding: 12px;
             text-align: left;
             font-weight: bold;
+            font-size: 13px;
         }
         table tbody tr:nth-child(even) {
             background-color: #f8f9fa;
         }
         table td {
             border: 1px solid #e9ecef;
-            padding: 8px 10px;
+            padding: 10px 12px;
+            font-size: 12px;
+        }
+        /* Menentukan lebar kolom untuk proporsi yang lebih baik */
+        table th:nth-child(1), table td:nth-child(1) { /* No */
+            width: 5%;
+        }
+        table th:nth-child(2), table td:nth-child(2) { /* Tanggal */
+            width: 15%;
+        }
+        table th:nth-child(3), table td:nth-child(3) { /* Kategori */
+            width: 15%;
+        }
+        table th:nth-child(4), table td:nth-child(4) { /* Keterangan */
+            width: 35%;
+        }
+        table th:nth-child(5), table td:nth-child(5) { /* Pemasukan */
+            width: 15%;
+            text-align: right;
+        }
+        table th:nth-child(6), table td:nth-child(6) { /* Pengeluaran */
+            width: 15%;
+            text-align: right;
         }
         .text-pemasukan {
             color: var(--green-color);
@@ -62,7 +85,7 @@
             border: 2px solid #e9ecef;
             padding: 15px;
             width: 40%;
-            margin-left: auto; /* Posisikan ke kanan */
+            margin-left: auto;
             background: #f8f9fa;
             border-radius: 8px;
         }
@@ -72,7 +95,9 @@
         }
         .summary-box td {
             border: none;
-            padding: 5px 0;
+            padding: 6px 0;
+            font-size: 12px;
+            white-space: nowrap; /* Mencegah teks turun ke baris baru */
         }
         .summary-box .total {
             font-weight: bold;
@@ -98,7 +123,7 @@
 <body>
 
     <div class="header">
-        <h1>Laporan Keuangan</h1>
+        <h1>Laporan Keuangan Dins</h1>
         <p>Ringkasan transaksi berdasarkan filter yang dipilih.</p>
         @if(!empty($filters['tanggal_mulai']) && !empty($filters['tanggal_selesai']))
             <p><strong>Periode:</strong> {{ \Carbon\Carbon::parse($filters['tanggal_mulai'])->isoFormat('D MMMM Y') }} - {{ \Carbon\Carbon::parse($filters['tanggal_selesai'])->isoFormat('D MMMM Y') }}</p>
@@ -120,7 +145,7 @@
             @forelse($data as $index => $item)
                 <tr>
                     <td>{{ $index + 1 }}</td>
-                    <td>{{ $item->created_at->isoFormat('D MMM Y') }}</td>
+                    <td>{{ $item->created_at->isoFormat('D MMM Y, HH:mm') }}</td>
                     <td>{{ $item->kategoriNama->nama ?? 'N/A' }}</td>
                     <td>{{ $item->keterangan }}</td>
                     @if($item->kategoriJenis->jenis === 'Pemasukan')
@@ -150,7 +175,7 @@
                 <td style="text-align: right;" class="text-pengeluaran">Rp{{ number_format($totalPengeluaran, 0, ',', '.') }}</td>
             </tr>
             <tr class="total">
-                <td>SALDO AKHIR</td>
+                <td>Saldo Akhir</td>
                 <td style="text-align: right;">Rp{{ number_format($saldoAkhir, 0, ',', '.') }}</td>
             </tr>
         </table>

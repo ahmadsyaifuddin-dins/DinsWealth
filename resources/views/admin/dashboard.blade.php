@@ -114,7 +114,7 @@
     </div>
     
     {{-- Include Modal Tambah Transaksi --}}
-    @include('components.modal-tabungan')
+    @include('tabungan.partials.modal-tabungan')
     
     @push('scripts')
         {{-- Include script modal jika belum ada --}}
