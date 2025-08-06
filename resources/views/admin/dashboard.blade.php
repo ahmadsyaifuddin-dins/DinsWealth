@@ -129,19 +129,48 @@
 
             <!-- Chart dan Activity Grid -->
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8">
-                <!-- Grafik -->
+                <!-- Grafik dengan Controls -->
                 <div class="lg:col-span-2 bg-white rounded-2xl shadow-lg p-6 border border-gray-100">
-                    <div class="flex items-center justify-between mb-6">
+                    <!-- Header dengan Controls -->
+                    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 gap-4">
                         <div>
-                            <h3 class="text-lg sm:text-xl font-bold text-gray-800">Pengeluaran 7 Hari</h3>
-                            <p class="text-gray-600 text-sm">Trend pengeluaran terakhir</p>
+                            <h3 class="text-lg sm:text-xl font-bold text-gray-800">Analisis Pengeluaran</h3>
+                            <p class="text-gray-600 text-sm" id="chartDescription">Trend pengeluaran 7 hari terakhir</p>
                         </div>
-                        <div class="bg-gradient-to-br from-red-500 to-pink-500 w-10 h-10 rounded-xl flex items-center justify-center">
-                            <i class="fas fa-chart-bar text-white"></i>
+                        
+                        <!-- Chart Controls -->
+                        <div class="flex items-center gap-2">
+                            <!-- Period Toggle -->
+                            <div class="flex bg-gray-100 rounded-xl p-1">
+                                <button id="periodWeekly" class="px-3 py-2 text-xs font-semibold rounded-lg bg-red-500 text-white transition-all duration-300">
+                                    7 Hari
+                                </button>
+                                <button id="periodMonthly" class="px-3 py-2 text-xs font-semibold rounded-lg text-gray-600 hover:text-gray-800 transition-all duration-300">
+                                    1 Bulan
+                                </button>
+                            </div>
+                            
+                            <!-- Chart Type Toggle -->
+                            <div class="flex bg-gray-100 rounded-xl p-1 ml-2">
+                                <button id="chartLine" class="p-2 rounded-lg text-gray-600 hover:text-gray-800 transition-all duration-300" title="Line Chart">
+                                    <i class="fas fa-chart-line"></i>
+                                </button>
+                                <button id="chartBar" class="p-2 rounded-lg bg-red-500 text-white transition-all duration-300" title="Bar Chart">
+                                    <i class="fas fa-chart-bar"></i>
+                                </button>
+                            </div>
                         </div>
                     </div>
+                    
+                    <!-- Chart Container -->
                     <div class="bg-gray-50 rounded-xl p-4">
-                        <canvas id="weeklyExpenseChart"></canvas>
+                        <canvas id="expenseChart" height="300"></canvas>
+                    </div>
+                    
+                    <!-- Chart Info -->
+                    <div class="mt-4 flex items-center justify-between text-sm text-gray-600">
+                        <span id="chartInfo">Total 7 hari: Rp0</span>
+                        <span class="text-xs">Klik tombol untuk mengubah tampilan</span>
                     </div>
                 </div>
 
@@ -205,46 +234,165 @@
         
         <script>
             document.addEventListener('DOMContentLoaded', function() {
-                const chartData = @json($chartData);
-                const ctx = document.getElementById('weeklyExpenseChart');
+                // Data dari controller
+                const monthlyData = @json($monthlyChartData ?? null);
+                const weeklyData = @json($weeklyChartData ?? null);
                 
-                if (ctx && chartData.labels.length > 0) {
-                    new Chart(ctx, {
-                        type: 'bar',
+                // Chart instance
+                let chart = null;
+                
+                // Current settings
+                let currentPeriod = 'weekly'; // weekly | monthly
+                let currentType = 'bar';      // bar | line
+                
+                // DOM Elements
+                const canvas = document.getElementById('expenseChart');
+                const periodWeekly = document.getElementById('periodWeekly');
+                const periodMonthly = document.getElementById('periodMonthly');
+                const chartLine = document.getElementById('chartLine');
+                const chartBar = document.getElementById('chartBar');
+                const chartDescription = document.getElementById('chartDescription');
+                const chartInfo = document.getElementById('chartInfo');
+                
+                // Initialize chart
+                function initChart() {
+                    if (chart) {
+                        chart.destroy();
+                    }
+                    
+                    const data = currentPeriod === 'weekly' ? weeklyData : monthlyData;
+                    if (!data || !data.labels.length) return;
+                    
+                    const ctx = canvas.getContext('2d');
+                    
+                    chart = new Chart(ctx, {
+                        type: currentType,
                         data: {
-                            labels: chartData.labels,
+                            labels: data.labels,
                             datasets: [{
-                                label: 'Total Pengeluaran',
-                                data: chartData.data,
-                                backgroundColor: 'rgba(239, 68, 68, 0.8)',
+                                label: currentPeriod === 'weekly' ? 'Pengeluaran Harian' : 'Pengeluaran Harian',
+                                data: data.data,
+                                backgroundColor: currentType === 'line' ? 'rgba(239, 68, 68, 0.1)' : 'rgba(239, 68, 68, 0.8)',
                                 borderColor: 'rgba(239, 68, 68, 1)',
-                                borderWidth: 1,
-                                borderRadius: 8,
+                                borderWidth: currentType === 'line' ? 3 : 1,
+                                fill: currentType === 'line',
+                                tension: currentType === 'line' ? 0.4 : 0,
+                                pointBackgroundColor: 'rgba(239, 68, 68, 1)',
+                                pointBorderColor: '#ffffff',
+                                pointBorderWidth: 2,
+                                pointRadius: currentType === 'line' ? 4 : 0,
+                                pointHoverRadius: currentType === 'line' ? 6 : 0,
+                                borderRadius: currentType === 'bar' ? 8 : 0,
                             }]
                         },
                         options: {
                             responsive: true,
                             maintainAspectRatio: false,
                             plugins: {
-                                legend: {
-                                    display: false
+                                legend: { display: false },
+                                tooltip: {
+                                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                                    titleColor: '#ffffff',
+                                    bodyColor: '#ffffff',
+                                    borderColor: 'rgba(239, 68, 68, 1)',
+                                    borderWidth: 1,
+                                    cornerRadius: 8,
+                                    displayColors: false,
+                                    callbacks: {
+                                        label: function(context) {
+                                            return 'Pengeluaran: Rp' + context.parsed.y.toLocaleString('id-ID');
+                                        }
+                                    }
                                 }
                             },
                             scales: {
                                 y: {
                                     beginAtZero: true,
                                     grid: {
-                                        color: 'rgba(0,0,0,0.1)'
+                                        color: 'rgba(0,0,0,0.1)',
+                                        drawBorder: false,
+                                    },
+                                    ticks: {
+                                        callback: function(value) {
+                                            return value > 999 ? 'Rp' + (value/1000).toFixed(0) + 'k' : 'Rp' + value.toLocaleString('id-ID');
+                                        }
                                     }
                                 },
                                 x: {
-                                    grid: {
-                                        display: false
+                                    grid: { display: false },
+                                    ticks: {
+                                        maxTicksLimit: currentPeriod === 'monthly' ? 15 : 7,
                                     }
                                 }
-                            }
+                            },
+                            interaction: {
+                                intersect: false,
+                                mode: 'index',
+                            },
                         }
                     });
+                    
+                    updateUI();
+                }
+                
+                // Update UI descriptions
+                function updateUI() {
+                    const data = currentPeriod === 'weekly' ? weeklyData : monthlyData;
+                    
+                    if (currentPeriod === 'weekly') {
+                        chartDescription.textContent = 'Trend pengeluaran 7 hari terakhir';
+                        chartInfo.textContent = `Total 7 hari: Rp${data.total.toLocaleString('id-ID')}`;
+                    } else {
+                        chartDescription.textContent = `Trend pengeluaran ${data.bulan}`;
+                        chartInfo.textContent = `Total bulan: Rp${data.total.toLocaleString('id-ID')}`;
+                    }
+                }
+                
+                // Toggle active states
+                function setActiveButton(activeBtn, inactiveBtn) {
+                    activeBtn.classList.remove('text-gray-600', 'hover:text-gray-800');
+                    activeBtn.classList.add('bg-red-500', 'text-white');
+                    
+                    inactiveBtn.classList.remove('bg-red-500', 'text-white');
+                    inactiveBtn.classList.add('text-gray-600', 'hover:text-gray-800');
+                }
+                
+                // Event listeners
+                periodWeekly.addEventListener('click', () => {
+                    if (currentPeriod !== 'weekly') {
+                        currentPeriod = 'weekly';
+                        setActiveButton(periodWeekly, periodMonthly);
+                        initChart();
+                    }
+                });
+                
+                periodMonthly.addEventListener('click', () => {
+                    if (currentPeriod !== 'monthly') {
+                        currentPeriod = 'monthly';
+                        setActiveButton(periodMonthly, periodWeekly);
+                        initChart();
+                    }
+                });
+                
+                chartLine.addEventListener('click', () => {
+                    if (currentType !== 'line') {
+                        currentType = 'line';
+                        setActiveButton(chartLine, chartBar);
+                        initChart();
+                    }
+                });
+                
+                chartBar.addEventListener('click', () => {
+                    if (currentType !== 'bar') {
+                        currentType = 'bar';
+                        setActiveButton(chartBar, chartLine);
+                        initChart();
+                    }
+                });
+                
+                // Initialize
+                if (canvas && (weeklyData || monthlyData)) {
+                    initChart();
                 }
             });
         </script>
