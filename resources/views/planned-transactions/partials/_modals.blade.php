@@ -31,6 +31,7 @@
                     <div>
                         <label for="create_nominal" class="block text-sm font-medium text-gray-700">Nominal</label>
                         <input type="text" id="create_nominal" required
+                            inputmode="numeric"
                             class="mt-1 block w-full border-gray-300 rounded-md shadow-sm" placeholder="100.000">
                         <input type="hidden" name="nominal" id="create_nominal_raw">
                     </div>
@@ -87,6 +88,7 @@
                     <div>
                         <label for="edit_nominal" class="block text-sm font-medium text-gray-700">Nominal</label>
                         <input type="text" id="edit_nominal" required
+                            inputmode="numeric"
                             class="mt-1 block w-full border-gray-300 rounded-md shadow-sm">
                         <input type="hidden" name="nominal" id="edit_nominal_raw">
                     </div>

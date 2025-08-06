@@ -30,6 +30,10 @@ class AdminController extends Controller
             ->whereMonth('created_at', now()->month)
             ->whereYear('created_at', now()->year)
             ->sum('nominal');
+        $pengeluaranBulanIni = Tabungan::whereHas('kategoriJenis', fn($q) => $q->where('jenis', 'Pengeluaran'))
+            ->whereMonth('created_at', now()->month)
+            ->whereYear('created_at', now()->year)
+            ->sum('nominal');
         $transaksiTerakhir = Tabungan::with(['kategoriNama', 'kategoriJenis'])->latest()->take(5)->get();
         $pengeluaran7Hari = Tabungan::whereHas('kategoriJenis', fn($q) => $q->where('jenis', 'Pengeluaran'))
             ->where('created_at', '>=', now()->subDays(6)->startOfDay())
@@ -53,6 +57,7 @@ class AdminController extends Controller
         return view('admin.dashboard', compact(
             'saldoSaatIni',
             'pemasukanBulanIni',
+            'pengeluaranBulanIni',
             'transaksiTerakhir',
             'chartData',
             'namaKategori',      // <-- Tambahkan ini

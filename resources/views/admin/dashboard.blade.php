@@ -8,87 +8,160 @@
         </p>
     </x-slot>
 
-    <div class="py-12">
-        <div class="mx-auto max-w-7xl sm:px-6 lg:px-8">
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+    <div class="py-6 px-4 sm:py-12 sm:px-6 lg:px-8">
+        <div class="mx-auto max-w-7xl">
+            <!-- Cards Grid - Responsive -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-6 sm:mb-8">
                 
-                {{-- 1. Kartu Ringkasan Utama --}}
-                <div class="bg-gradient-to-br from-indigo-500 to-purple-600 text-white rounded-2xl shadow-lg p-6 h-32 flex flex-col justify-between">
-                    <p class="text-indigo-100 text-sm">Saldo Saat Ini</p>
-                    <p class="text-3xl font-bold">Rp{{ number_format($saldoSaatIni, 0, ',', '.') }}</p>
-                </div>
-                <div class="bg-white rounded-2xl shadow-lg p-6 h-32 flex flex-col justify-between">
-                    <p class="text-gray-500 text-sm">Pemasukan Bulan Ini</p>
-                    <p class="text-2xl font-bold text-green-600">Rp{{ number_format($pemasukanBulanIni, 0, ',', '.') }}</p>
+                <!-- Kartu Saldo Saat Ini -->
+                <div class="bg-gradient-to-br from-blue-500 to-purple-600 text-white rounded-2xl shadow-lg p-6 hover:shadow-xl transition-shadow duration-300">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="bg-white/20 rounded-xl p-2">
+                            <i class="fas fa-wallet text-xl"></i>
+                        </div>
+                    </div>
+                    <div>
+                        <p class="text-blue-100 text-xs uppercase tracking-wide font-medium">Saldo Saat Ini</p>
+                        <p class="text-2xl sm:text-3xl font-bold mt-1 mb-2">Rp{{ number_format($saldoSaatIni, 0, ',', '.') }}</p>
+                        <div class="flex items-center text-blue-100 text-xs">
+                            <i class="fas fa-chart-line mr-1"></i>
+                            <span>Total Balance</span>
+                        </div>
+                    </div>
                 </div>
                 
-                {{-- 2. Tombol Aksi Cepat --}}
-                <div class="bg-white rounded-2xl shadow-lg p-6 flex flex-col justify-center space-y-3 h-auto min-h-[200px]">
-                    <a href="{{ route('tabungan.index') }}" class="w-full text-center bg-indigo-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-indigo-700 transition-all duration-200 transform hover:scale-105 shadow-md">
-                        <i class="fas fa-wallet mr-2"></i>Kelola Tabungan
-                    </a>
-                    <button onclick="openModal()" class="w-full text-center bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-bold py-3 px-4 rounded-lg hover:from-emerald-600 hover:to-teal-700 transition-all duration-200 transform hover:scale-105 shadow-md">
-                        <i class="fas fa-plus mr-2"></i>Tambah Transaksi Cepat
-                    </button>
+                <!-- Kartu Pemasukan Bulan Ini -->
+                <div class="bg-gradient-to-br from-emerald-500 to-green-600 text-white rounded-2xl shadow-lg p-6 hover:shadow-xl transition-shadow duration-300">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="bg-white/20 rounded-xl p-2">
+                            <i class="fas fa-arrow-trend-up text-xl"></i>
+                        </div>
+                    </div>
+                    <div>
+                        <p class="text-emerald-100 text-xs uppercase tracking-wide font-medium">Pemasukan Bulan Ini</p>
+                        <p class="text-2xl sm:text-3xl font-bold mt-1 mb-2">Rp{{ number_format($pemasukanBulanIni, 0, ',', '.') }}</p>
+                        <div class="flex items-center text-emerald-100 text-xs">
+                            <i class="fas fa-calendar-alt mr-1"></i>
+                            <span>{{ \Carbon\Carbon::now()->locale('id')->isoFormat('MMMM Y') }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Kartu Pengeluaran Bulan Ini -->
+                <div class="bg-gradient-to-br from-red-500 to-pink-600 text-white rounded-2xl shadow-lg p-6 hover:shadow-xl transition-shadow duration-300">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="bg-white/20 rounded-xl p-2">
+                            <i class="fas fa-arrow-trend-down text-xl"></i>
+                        </div>
+                    </div>
+                    <div>
+                        <p class="text-red-100 text-xs uppercase tracking-wide font-medium">Pengeluaran Bulan Ini</p>
+                        <p class="text-2xl sm:text-3xl font-bold mt-1 mb-2">Rp{{ number_format($pengeluaranBulanIni, 0, ',', '.') }}</p>
+                        <div class="flex items-center text-red-100 text-xs">
+                            <i class="fas fa-calendar-alt mr-1"></i>
+                            <span>{{ \Carbon\Carbon::now()->locale('id')->isoFormat('MMMM Y') }}</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Tombol Aksi Cepat -->
+                <div class="bg-white rounded-2xl shadow-lg p-6 border border-gray-100">
+                    <div class="text-center mb-4">
+                        <div class="bg-gradient-to-br from-purple-500 to-pink-500 w-12 h-12 rounded-xl flex items-center justify-center mx-auto mb-2">
+                            <i class="fas fa-bolt text-white text-xl"></i>
+                        </div>
+                        <h3 class="font-bold text-gray-800">Quick Actions</h3>
+                    </div>
                     
-                    {{-- Backup Section yang Dipercantik --}}
-                    <div class="bg-gradient-to-br from-slate-50 to-slate-100 rounded-xl p-3 border border-slate-200">
-                        <div class="flex items-center mb-2">
-                            <div class="w-6 h-6 bg-gradient-to-br from-blue-500 to-cyan-600 rounded-lg flex items-center justify-center mr-2">
-                                <i class="fas fa-download text-white text-xs"></i>
-                            </div>
-                            <h4 class="font-semibold text-gray-800 text-sm">Backup Data</h4>
-                        </div>
+                    <div class="space-y-3">
+                        <a href="{{ route('tabungan.index') }}" class="block w-full text-center bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-semibold py-3 px-4 rounded-xl hover:from-indigo-700 hover:to-purple-700 transition-colors duration-300">
+                            <i class="fas fa-wallet mr-2"></i>Kelola Tabungan
+                        </a>
                         
-                        <form method="POST" action="{{ route('backup.download') }}" class="space-y-2">
-                            @csrf
-                            <div class="relative">
-                                <label for="format" class="block text-xs font-medium text-gray-700 mb-1">
-                                    <i class="fas fa-file-export mr-1 text-gray-500"></i>
-                                    Format Export:
-                                </label>
-                                <select name="format" id="format" class="w-full px-3 py-2 bg-white border-2 border-gray-200 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all duration-200 appearance-none cursor-pointer text-sm" required>
-                                    <option value="" class="text-gray-400">-- Pilih Format --</option>
-                                    <option value="json" class="text-gray-800">
-                                        📄 JSON (Lengkap)
-                                    </option>
-                                    <option value="csv" class="text-gray-800">
-                                        📊 CSV (Excel Compatible)
-                                    </option>
-                                </select>
-                                <div class="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none mt-6">
-                                </div>
-                            </div>
-                            
-                            <button type="submit" class="w-full bg-gradient-to-r from-blue-600 to-cyan-600 text-white font-semibold py-2 px-3 rounded-lg hover:from-blue-700 hover:to-cyan-700 transition-all duration-200 transform hover:scale-105 shadow-lg hover:shadow-xl flex items-center justify-center group text-sm">
-                                <i class="fas fa-cloud-download-alt mr-1 group-hover:animate-bounce text-xs"></i>
-                                Download Backup
-                            </button>
-                        </form>
-                        
-                        <div class="mt-2 text-xs text-gray-500 flex items-center">
-                            <i class="fas fa-info-circle mr-1"></i>
-                            Data akan diunduh dalam format yang dipilih
-                        </div>
+                        <button onclick="openModal()" class="w-full text-center bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-semibold py-3 px-4 rounded-xl hover:from-emerald-600 hover:to-teal-700 transition-colors duration-300">
+                            <i class="fas fa-plus mr-2"></i>Tambah Transaksi
+                        </button>
                     </div>
                 </div>
             </div>
 
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                {{-- 3. Grafik Ringkas --}}
-                <div class="lg:col-span-2 bg-white rounded-2xl shadow-lg p-6">
-                    <h3 class="text-lg font-semibold text-gray-800 mb-4">Pengeluaran 7 Hari Terakhir</h3>
-                    <canvas id="weeklyExpenseChart"></canvas>
+            <!-- Section Backup Data -->
+            <div class="mb-6 sm:mb-8">
+                <div class="bg-white rounded-2xl shadow-lg p-6 border border-gray-100">
+                    <div class="flex items-center mb-6">
+                        <div class="bg-gradient-to-br from-blue-500 to-cyan-600 w-10 h-10 rounded-xl flex items-center justify-center mr-3">
+                            <i class="fas fa-shield-alt text-white"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-lg sm:text-xl font-bold text-gray-800">Data Backup</h3>
+                            <p class="text-gray-600 text-sm">Download backup data keuangan</p>
+                        </div>
+                    </div>
+                    
+                    <form method="POST" action="{{ route('backup.download') }}" class="max-w-sm">
+                        @csrf
+                        <div class="space-y-4">
+                            <div>
+                                <label for="format" class="block text-sm font-semibold text-gray-700 mb-2">
+                                    <i class="fas fa-file-export mr-2 text-blue-600"></i>
+                                    Format Export:
+                                </label>
+                                <select name="format" id="format" class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-colors duration-300 font-medium" required>
+                                    <option value="">-- Pilih Format --</option>
+                                    <option value="json">📄 JSON (Data Lengkap)</option>
+                                    <option value="csv">📊 CSV (Excel)</option>
+                                </select>
+                            </div>
+                            
+                            <button type="submit" class="w-full bg-gradient-to-r from-blue-600 to-cyan-600 text-white font-semibold py-3 px-4 rounded-xl hover:from-blue-700 hover:to-cyan-700 transition-colors duration-300 flex items-center justify-center">
+                                <i class="fas fa-cloud-download-alt mr-2"></i>
+                                Download Backup
+                            </button>
+                        </div>
+                        
+                        <div class="mt-4 p-3 bg-blue-50 rounded-xl flex items-start text-blue-800 text-sm">
+                            <i class="fas fa-info-circle mr-2 mt-0.5 text-blue-600"></i>
+                            <span>Data akan diunduh dalam format yang dipilih</span>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Chart dan Activity Grid -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8">
+                <!-- Grafik -->
+                <div class="lg:col-span-2 bg-white rounded-2xl shadow-lg p-6 border border-gray-100">
+                    <div class="flex items-center justify-between mb-6">
+                        <div>
+                            <h3 class="text-lg sm:text-xl font-bold text-gray-800">Pengeluaran 7 Hari</h3>
+                            <p class="text-gray-600 text-sm">Trend pengeluaran terakhir</p>
+                        </div>
+                        <div class="bg-gradient-to-br from-red-500 to-pink-500 w-10 h-10 rounded-xl flex items-center justify-center">
+                            <i class="fas fa-chart-bar text-white"></i>
+                        </div>
+                    </div>
+                    <div class="bg-gray-50 rounded-xl p-4">
+                        <canvas id="weeklyExpenseChart"></canvas>
+                    </div>
                 </div>
 
-                {{-- 4. Daftar Transaksi Terakhir --}}
-                <div class="bg-white rounded-2xl shadow-lg p-6">
-                    <h3 class="text-lg font-semibold text-gray-800 mb-4">Aktivitas Terakhir</h3>
-                    <div class="space-y-4">
+                <!-- Aktivitas Terakhir -->
+                <div class="bg-white rounded-2xl shadow-lg p-6 border border-gray-100">
+                    <div class="flex items-center justify-between mb-6">
+                        <div>
+                            <h3 class="text-lg font-bold text-gray-800">Aktivitas Terbaru</h3>
+                            <p class="text-gray-600 text-sm">Transaksi terakhir</p>
+                        </div>
+                        <div class="bg-gradient-to-br from-green-500 to-emerald-500 w-8 h-8 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-history text-white text-sm"></i>
+                        </div>
+                    </div>
+                    
+                    <div class="space-y-3 max-h-80 overflow-y-auto">
                         @forelse ($transaksiTerakhir as $item)
-                            <div class="flex items-center justify-between">
+                            <div class="flex items-center justify-between p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors duration-300">
                                 <div class="flex items-center">
-                                    <div class="w-10 h-10 rounded-full flex items-center justify-center mr-3 {{ $item->kategoriJenis->jenis === 'Pemasukan' ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-600' }}">
+                                    <div class="w-10 h-10 rounded-xl flex items-center justify-center mr-3 {{ $item->kategoriJenis->jenis === 'Pemasukan' ? 'bg-green-500 text-white' : 'bg-red-500 text-white' }}">
                                         @if($item->kategoriJenis->jenis === 'Pemasukan')
                                             <i class="fa-solid fa-arrow-up"></i>
                                         @else
@@ -96,16 +169,26 @@
                                         @endif
                                     </div>
                                     <div>
-                                        <p class="font-semibold text-gray-900">{{ $item->kategoriNama?->nama ?? 'Kategori Dihapus' }}</p>
-                                        <p class="text-xs text-gray-500">{{ $item->created_at->diffForHumans() }}</p>
+                                        <p class="font-semibold text-gray-900 text-sm">{{ $item->kategoriNama?->nama ?? 'Kategori Dihapus' }}</p>
+                                        <p class="text-xs text-gray-500">
+                                            {{ $item->created_at->diffForHumans() }}
+                                        </p>
                                     </div>
                                 </div>
-                                <p class="font-bold {{ $item->kategoriJenis?->jenis === 'Pemasukan' ? 'text-green-600' : 'text-red-600' }}">
-                                    {{ $item->kategoriJenis->jenis === 'Pemasukan' ? '+' : '-' }}Rp{{ number_format($item->nominal, 0, ',', '.') }}
-                                </p>
+                                <div class="text-right">
+                                    <p class="font-bold text-sm {{ $item->kategoriJenis?->jenis === 'Pemasukan' ? 'text-green-600' : 'text-red-600' }}">
+                                        {{ $item->kategoriJenis->jenis === 'Pemasukan' ? '+' : '-' }}Rp{{ number_format($item->nominal, 0, ',', '.') }}
+                                    </p>
+                                </div>
                             </div>
                         @empty
-                            <p class="text-gray-500 text-center py-8">Belum ada transaksi.</p>
+                            <div class="text-center py-8">
+                                <div class="bg-gray-100 w-12 h-12 rounded-xl flex items-center justify-center mx-auto mb-3">
+                                    <i class="fas fa-receipt text-gray-400"></i>
+                                </div>
+                                <p class="text-gray-500 font-medium text-sm">Belum ada transaksi</p>
+                                <p class="text-gray-400 text-xs">Mulai tambah transaksi pertama</p>
+                            </div>
                         @endforelse
                     </div>
                 </div>
@@ -133,16 +216,31 @@
                             datasets: [{
                                 label: 'Total Pengeluaran',
                                 data: chartData.data,
-                                backgroundColor: 'rgba(239, 68, 68, 0.7)',
+                                backgroundColor: 'rgba(239, 68, 68, 0.8)',
                                 borderColor: 'rgba(239, 68, 68, 1)',
                                 borderWidth: 1,
-                                borderRadius: 5
+                                borderRadius: 8,
                             }]
                         },
                         options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: {
+                                    display: false
+                                }
+                            },
                             scales: {
                                 y: {
-                                    beginAtZero: true
+                                    beginAtZero: true,
+                                    grid: {
+                                        color: 'rgba(0,0,0,0.1)'
+                                    }
+                                },
+                                x: {
+                                    grid: {
+                                        display: false
+                                    }
                                 }
                             }
                         }

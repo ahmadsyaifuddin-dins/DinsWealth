@@ -8,11 +8,6 @@
             <div class="relative z-10">
                 <div class="flex items-center justify-between">
                     <div class="flex items-center">
-                        <div class="w-12 h-12 bg-white bg-opacity-20 rounded-xl flex items-center justify-center mr-4">
-                            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
-                            </svg>
-                        </div>
                         <div>
                             <h2 class="text-2xl font-bold text-white">Tambah Tabungan</h2>
                             <p class="text-indigo-100 text-sm">Masukkan detail transaksi baru</p>
@@ -94,6 +89,7 @@
                             type="text"
                             name="nominal"
                             id="nominal"
+                            inputmode="numeric"
                             class="w-full py-3 pl-12 pr-4 bg-gray-50 border-2 border-gray-200 rounded-xl text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-green-500 transition-all duration-300 font-medium"
                             placeholder="0"
                             oninput="formatNominal(this)"
@@ -135,7 +131,7 @@
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
                         </svg>
-                        <span>Simpan Tabungan</span>
+                        <span>Tabungan</span>
                     </button>
                 </div>
             </form>
