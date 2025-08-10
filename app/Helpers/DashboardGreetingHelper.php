@@ -70,7 +70,8 @@ class DashboardGreetingHelper
                 'gradient_text' => 'from-green-600 to-emerald-700',
                 'status' => 'Zero Spending',
                 'badge_color' => 'bg-green-500/20 text-green-100 border-green-400/30',
-                'badge_icon' => '🌟',
+                'badge_icon' => 'fa-solid fa-star',
+                'icon_badge_color' => 'text-green-500',
                 'badge_text' => 'Excellent Control',
                 'pesan' => self::getRandomMessage([
                     "Luar biasa! Hari ini kamu belum mengeluarkan uang sama sekali. Pertahankan kebiasaan hemat ini! 💚",
@@ -89,7 +90,8 @@ class DashboardGreetingHelper
                 'gradient_text' => 'from-blue-600 to-cyan-700',
                 'status' => 'Low Spending',
                 'badge_color' => 'bg-blue-500/20 text-blue-100 border-blue-400/30',
-                'badge_icon' => '👍',
+                'badge_icon' => 'fa-solid fa-thumbs-up',
+                'icon_badge_color' => 'text-white',
                 'badge_text' => 'Great Management',
                 'pesan' => self::getRandomMessage([
                     "Bagus! Pengeluaran hari ini jauh di bawah rata-rata. Kamu hebat dalam mengatur keuangan! 👍",
@@ -108,7 +110,8 @@ class DashboardGreetingHelper
                 'gradient_text' => 'from-indigo-600 to-purple-700',
                 'status' => 'Normal Spending',
                 'badge_color' => 'bg-purple-500/20 text-purple-100 border-purple-400/30',
-                'badge_icon' => '✅',
+                'badge_icon' => 'fa-solid fa-check-circle',
+                'icon_badge_color' => 'text-white',
                 'badge_text' => 'Good Balance',
                 'pesan' => self::getRandomMessage([
                     "Good job! Pengeluaran masih dalam batas normal. Keep spending wisely! ✅",
@@ -127,7 +130,8 @@ class DashboardGreetingHelper
                 'gradient_text' => 'from-yellow-600 to-orange-600',
                 'status' => 'Above Average',
                 'badge_color' => 'bg-yellow-500/20 text-yellow-100 border-yellow-400/30',
-                'badge_icon' => '⚠️',
+                'badge_icon' => 'fa-solid fa-exclamation-triangle',
+                'icon_badge_color' => 'text-white',
                 'badge_text' => 'Watch Spending',
                 'pesan' => self::getRandomMessage([
                     "Hmm, pengeluaran hari ini agak tinggi. Coba review lagi ya, masih ada yang bisa dihemat? 🤔",
@@ -147,7 +151,8 @@ class DashboardGreetingHelper
             'gradient_text' => 'from-red-600 to-pink-700',
             'status' => $isLowBalance ? 'Critical Alert' : 'High Spending',
             'badge_color' => 'bg-red-500/20 text-red-100 border-red-400/30',
-            'badge_icon' => '🚨',
+            'badge_icon' => 'fa-solid fa-fire',
+            'icon_badge_color' => 'text-white',
             'badge_text' => 'High Alert',
             'pesan' => self::getRandomMessage($isLowBalance ? [
                 "Whoa! Pengeluaran hari ini sangat tinggi dan saldo mulai tipis. Time to budget more carefully! 🚨",

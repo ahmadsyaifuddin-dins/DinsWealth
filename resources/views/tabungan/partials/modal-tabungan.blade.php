@@ -90,6 +90,7 @@
                             name="nominal"
                             id="nominal"
                             inputmode="numeric"
+
                             class="w-full py-3 pl-12 pr-4 bg-gray-50 border-2 border-gray-200 rounded-xl text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-green-500 transition-all duration-300 font-medium"
                             placeholder="0"
                             oninput="formatNominal(this)"
@@ -131,7 +132,7 @@
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
                         </svg>
-                        <span>Tabungan</span>
+                        <span>Simpan</span>
                     </button>
                 </div>
             </form>
