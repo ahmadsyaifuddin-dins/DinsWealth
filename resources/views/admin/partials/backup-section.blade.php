@@ -1,5 +1,5 @@
 <!-- Enhanced Backup Section -->
-<div class="bg-white rounded-3xl shadow-xl p-8 border border-gray-100">
+<div class="bg-white dark:bg-slate-800 rounded-3xl shadow-xl p-8 border border-gray-100 dark:border-slate-700">
     <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between">
         <!-- Left Side - Info -->
         <div class="mb-6 lg:mb-0 lg:flex-1">
@@ -8,8 +8,8 @@
                     <i class="fas fa-shield-alt text-white text-xl"></i>
                 </div> -->
                 <div>
-                    <h3 class="text-2xl font-bold text-gray-800">Data Backup & Export</h3>
-                    <p class="text-gray-600">Lindungi data keuanganmu dengan backup berkala</p>
+                    <h3 class="text-2xl font-bold text-gray-800 dark:text-gray-100">Data Backup & Export</h3>
+                    <p class="text-gray-600 dark:text-gray-300">Lindungi data keuanganmu dengan backup berkala</p>
                 </div>
             </div>
             

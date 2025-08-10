@@ -1,6 +1,6 @@
 {{-- Modal Konfirmasi Hapus --}}
 <div id="deleteModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50 hidden">
-    <div class="relative top-20 mx-auto p-5 border w-11/12 max-w-md shadow-lg rounded-xl bg-white">
+    <div class="relative top-20 mx-auto p-5 border w-11/12 max-w-md shadow-lg rounded-xl bg-white dark:bg-slate-900">
         <div class="mt-3 text-center">
             {{-- Icon Warning --}}
             <div class="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-red-100 mb-4">
@@ -10,18 +10,18 @@
             </div>
 
             {{-- Title --}}
-            <h3 class="text-xl font-bold text-gray-900 mb-4">
+            <h3 class="text-xl font-bold text-gray-900 dark:text-gray-300 mb-4">
                 <i class="fa-solid fa-warning mr-2 text-red-500"></i>
                 Konfirmasi Penghapusan</h3>
             
             {{-- Content --}}
             <div class="px-2 py-3">
-                <div class="bg-red-50 border border-red-200 rounded-lg p-4 mb-4">
-                    <p class="text-sm text-gray-700 mb-2">
+                <div class="bg-red-50 dark:bg-slate-700 border border-red-200 rounded-lg p-4 mb-4">
+                    <p class="text-sm text-gray-700 dark:text-gray-300 mb-2">
                         Anda akan menghapus data tabungan:
                     </p>
-                    <p class="font-bold text-gray-900 text-lg" id="tabunganName"></p>
-                    <p class="font-semibold text-red-600 text-lg" id="tabunganAmount"></p>
+                    <p class="font-bold text-gray-900 dark:text-gray-300 text-lg" id="tabunganName"></p>
+                    <p class="font-semibold text-red-700 dark:text-red-400 text-lg" id="tabunganAmount"></p>
                 </div>
                 
                 <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-3 mb-4">
@@ -36,7 +36,7 @@
                         Ketik "KONFIRMASI" untuk melanjutkan:
                     </label>
                     <input type="text" id="confirmationInput" 
-                           class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 text-center font-bold text-lg" 
+                           class="w-full dark:bg-slate-700 dark:text-gray-300 px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 text-center font-bold text-lg" 
                            placeholder="Ketik KONFIRMASI"
                            autocomplete="off">
                     <p id="confirmationError" class="text-red-500 text-sm mt-2 hidden font-medium">
@@ -54,7 +54,7 @@
                     Hapus Data
                 </button>
                 <button onclick="closeDeleteModal()" 
-                        class="w-full px-6 py-3 bg-gray-200 text-gray-700 text-base font-bold rounded-lg shadow hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transform hover:scale-105 transition-all duration-200">
+                        class="w-full px-6 py-3 bg-gray-200 dark:bg-slate-700 dark:text-gray-300 text-gray-700 text-base font-bold rounded-lg shadow hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transform hover:scale-105 transition-all duration-200">
                     <i class="fa-solid fa-times mr-2"></i>
                     Batal
                 </button>

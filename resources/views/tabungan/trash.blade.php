@@ -1,7 +1,7 @@
 <x-app-layout>
     <x-slot name="header">
         <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 px-4 sm:px-0">
-            <h2 class="font-semibold text-lg sm:text-xl text-gray-800 leading-tight">
+            <h2 class="font-semibold text-lg sm:text-xl text-gray-800 dark:text-gray-300 leading-tight">
                 {{ __('Sampah Tabungan') }}
             </h2>
             <div class="flex flex-wrap gap-2">
@@ -38,59 +38,59 @@
                 </div>
             @endif
 
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                <div class="p-4 sm:p-6 text-gray-900">
+            <div class="bg-white dark:bg-slate-800 overflow-hidden shadow-sm sm:rounded-lg">
+                <div class="p-4 sm:p-6 text-gray-900 dark:text-gray-300">
                     @if($trashedTabungans->count() > 0)
-                        <div class="mb-4 bg-yellow-100 border border-yellow-400 text-yellow-700 px-4 py-3 rounded relative text-sm sm:text-base" role="alert">
+                        <div class="mb-4 bg-yellow-100 dark:bg-slate-700 border border-yellow-400 dark:border-yellow-200 text-yellow-700 dark:text-yellow-200 px-4 py-3 rounded relative text-sm sm:text-base" role="alert">
                             <span class="block sm:inline">
                                 <strong>Info:</strong> Terdapat {{ $trashedTabungans->total() }} data tabungan dalam sampah.
                             </span>
                         </div>
 
                         <div class="overflow-x-auto">
-                            <table class="min-w-[640px] w-full divide-y divide-gray-200">
-                                <thead class="bg-gray-50">
+                            <table class="min-w-[640px] w-full divide-y divide-gray-200 dark:divide-gray-700">
+                                <thead class="bg-gray-50 dark:bg-gray-700">
                                     <tr>
-                                        <th class="px-2 sm:px-3 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[5%]">No</th>
-                                        <th class="px-2 sm:px-3 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[20%]">Nama Tabungan</th>
-                                        <th class="px-2 sm:px-3 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[15%]">Jenis</th>
-                                        <th class="px-2 sm:px-3 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[15%]">Nominal</th>
-                                        <th class="px-2 sm:px-3 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[20%]">Keterangan</th>
-                                        <th class="px-2 sm:px-3 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[15%]">Dihapus Pada</th>
-                                        <th class="px-2 sm:px-3 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[25%]">Aksi</th>
+                                        <th class="px-2 sm:px-3 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider w-[5%]">No</th>
+                                        <th class="px-2 sm:px-3 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider w-[20%]">Nama Tabungan</th>
+                                        <th class="px-2 sm:px-3 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider w-[15%]">Jenis</th>
+                                        <th class="px-2 sm:px-3 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider w-[15%]">Nominal</th>
+                                        <th class="px-2 sm:px-3 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider w-[20%]">Keterangan</th>
+                                        <th class="px-2 sm:px-3 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider w-[15%]">Dihapus Pada</th>
+                                        <th class="px-2 sm:px-3 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider w-[25%]">Aksi</th>
                                     </tr>
                                 </thead>
-                                <tbody class="bg-white divide-y divide-gray-200">
+                                <tbody class="bg-white divide-y divide-gray-200 dark:divide-gray-700">
                                     @foreach($trashedTabungans as $key => $tabungan)
-                                        <tr class="bg-red-50">
-                                            <td class="px-2 sm:px-3 py-2 sm:py-4 whitespace-nowrap text-xs sm:text-sm text-gray-900">
+                                        <tr class="bg-red-50 dark:bg-slate-600">
+                                            <td class="px-2 sm:px-3 py-2 sm:py-4 whitespace-nowrap text-xs sm:text-sm text-gray-900 dark:text-gray-300">
                                                 {{ $trashedTabungans->firstItem() + $key }}
                                             </td>
-                                            <td class="px-2 sm:px-3 py-2 sm:py-4 text-xs sm:text-sm text-gray-900">
+                                            <td class="px-2 sm:px-3 py-2 sm:py-4 text-xs sm:text-sm text-gray-900 dark:text-gray-300">
                                                 {{ $tabungan->kategoriNama->nama ?? 'N/A' }}
                                             </td>
                                             <td class="px-2 sm:px-3 py-2 sm:py-4 whitespace-nowrap">
                                                 <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
-                                                    {{ $tabungan->jenis == 1 ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' }}">
+                                                    {{ $tabungan->jenis == 1 ? 'bg-green-100 text-green-800 dark:bg-green-600 dark:text-green-200' : 'bg-red-100 text-red-800 dark:bg-red-600 dark:text-red-200' }}">
                                                     {{ $tabungan->kategoriJenis->jenis ?? 'N/A' }}
                                                 </span>
                                             </td>
-                                            <td class="px-2 sm:px-3 py-2 sm:py-4 whitespace-nowrap text-xs sm:text-sm text-gray-900">
+                                            <td class="px-2 sm:px-3 py-2 sm:py-4 whitespace-nowrap text-xs sm:text-sm text-gray-900 dark:text-gray-300">
                                                 {{ $tabungan->formatted_nominal }}
                                             </td>
-                                            <td class="px-2 sm:px-3 py-2 sm:py-4 text-xs sm:text-sm text-gray-900">
+                                            <td class="px-2 sm:px-3 py-2 sm:py-4 text-xs sm:text-sm text-gray-900 dark:text-gray-300">
                                                 {{ Str::limit($tabungan->keterangan, 30) }}
                                             </td>
-                                            <td class="px-2 sm:px-3 py-2 sm:py-4 whitespace-nowrap text-xs sm:text-sm text-gray-900">
+                                            <td class="px-2 sm:px-3 py-2 sm:py-4 whitespace-nowrap text-xs sm:text-sm text-gray-900 dark:text-gray-300">
                                                 {{ $tabungan->deleted_at->format('d/m/Y H:i') }}
                                             </td>
                                             <td class="px-2 sm:px-3 py-2 sm:py-4 whitespace-nowrap text-xs sm:text-sm font-medium space-x-1 sm:space-x-2">
-                                                <button onclick="restoreData({{ $tabungan->id }})" class="text-green-600 hover:text-green-900 inline-flex items-center touch-manipulation">
+                                                <button onclick="restoreData({{ $tabungan->id }})" class="text-green-600 hover:text-green-900 dark:text-green-400 dark:hover:text-green-500 inline-flex items-center touch-manipulation">
                                                     <i class="fa-solid fa-rotate mr-1"></i>
                                                     <span class="hidden sm:inline">Pulihkan</span>
                                                     <span class="sm:hidden">Restore</span>
                                                 </button>
-                                                <button onclick="openForceDeleteModal({{ $tabungan->id }}, '{{ $tabungan->kategoriNama->nama ?? 'N/A' }}')" class="text-red-600 hover:text-red-900 inline-flex items-center touch-manipulation">
+                                                <button onclick="openForceDeleteModal({{ $tabungan->id }}, '{{ $tabungan->kategoriNama->nama ?? 'N/A' }}')" class="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-500 inline-flex items-center touch-manipulation">
                                                     <i class="fa-solid fa-trash mr-1"></i>
                                                     <span class="hidden sm:inline">Hapus Permanen</span>
                                                     <span class="sm:hidden">Delete</span>
@@ -109,8 +109,8 @@
                     @else
                         <div class="text-center py-8 sm:py-12">
                             <i class="fa-solid fa-trash"></i>
-                            <h3 class="mt-2 text-sm sm:text-base font-medium text-gray-900">Sampah kosong</h3>
-                            <p class="mt-1 text-sm text-gray-500">Tidak ada data tabungan yang dihapus.</p>
+                            <h3 class="mt-2 text-sm sm:text-base font-medium text-gray-900 dark:text-gray-400">Sampah kosong</h3>
+                            <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Tidak ada data tabungan yang dihapus.</p>
                         </div>
                     @endif
                 </div>

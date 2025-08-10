@@ -141,7 +141,7 @@ function closeEditModal() {
 function openCompleteModal(item) {
     const infoElement = document.getElementById('completeModalInfo');
     const formattedNominal = new Intl.NumberFormat('id-ID').format(item.nominal);
-    infoElement.innerHTML = `${item.keterangan} <br> <span class="text-indigo-600">Rp ${formattedNominal}</span>`;
+    infoElement.innerHTML = `${item.keterangan} <br> <span class="text-indigo-600 dark:text-indigo-400">Rp ${formattedNominal}</span>`;
 
     const tanggalInput = document.getElementById('tanggal_peristiwa');
     

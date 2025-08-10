@@ -1,11 +1,11 @@
 <div id="editTabunganModal" class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-50 hidden p-4 overflow-y-auto">
-    <div class="modal-content bg-white rounded-2xl shadow-2xl w-full max-w-lg mx-auto my-8 transform transition-all duration-300 max-h-[90vh] flex flex-col">
+    <div class="modal-content bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-lg mx-auto my-8 transform transition-all duration-300 max-h-[90vh] flex flex-col">
         
         {{-- Header Modal - Fixed --}}
-        <div class="flex justify-between items-center p-6 pb-4 border-b border-gray-100 flex-shrink-0">
-            <h3 class="text-2xl font-bold text-gray-800">Edit Tabungan</h3>
+        <div class="flex justify-between items-center p-6 pb-4 border-b border-gray-100 dark:border-gray-700 flex-shrink-0">
+            <h3 class="text-2xl font-bold text-gray-800 dark:text-white">Edit Tabungan</h3>
             <button onclick="closeEditModal()" 
-                class="text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full p-2 transition-all duration-200">
+                class="text-gray-400 hover:text-gray-600 hover:bg-gray-100 dark:hover:text-gray-400 rounded-full p-2 transition-all duration-200">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                 </svg>
@@ -22,11 +22,11 @@
                 <div class="space-y-6">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
-                            <label for="edit_nama" class="block text-sm font-medium text-gray-700 mb-2">
+                            <label for="edit_nama" class="block text-sm font-medium text-gray-700 dark:text-gray-400 mb-2">
                                 Sumber Dana
                             </label>
                             <select id="edit_nama" name="nama" 
-                                class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200" 
+                                class="w-full dark:bg-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-700 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200" 
                                 required>
                                 @foreach($namaKategori as $kat)
                                     <option value="{{ $kat->id }}">{{ $kat->nama }}</option>
@@ -35,11 +35,11 @@
                         </div>
                         
                         <div>
-                            <label for="edit_jenis" class="block text-sm font-medium text-gray-700 mb-2">
+                            <label for="edit_jenis" class="block text-sm font-medium text-gray-700 dark:text-gray-400 mb-2">
                                 Jenis Transaksi
                             </label>
                             <select id="edit_jenis" name="jenis" 
-                                class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200" 
+                                class="w-full dark:bg-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-700 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200" 
                                 required>
                                 @foreach($jenisKategori as $kat)
                                     <option value="{{ $kat->id }}">{{ $kat->jenis }}</option>
@@ -49,13 +49,13 @@
                     </div>
                     
                     <div>
-                        <label for="edit_nominal" class="block text-sm font-medium text-gray-700 mb-2">
+                        <label for="edit_nominal" class="block text-sm font-medium text-gray-700 dark:text-gray-400 mb-2">
                             Nominal
                         </label>
                         <div class="relative">
-                            <span class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 font-medium">Rp</span>
+                            <span class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 dark:text-gray-400 font-medium">Rp</span>
                             <input type="text" id="edit_nominal" name="nominal" 
-                                class="w-full pl-10 pr-4 py-2.5 border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200" 
+                                class="w-full pl-10 pr-4 py-2.5 dark:bg-gray-700 dark:text-gray-300 border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200" 
                                 required onkeyup="formatNominal(this)" 
                                 placeholder="0"
                                 inputmode="numeric"
@@ -64,11 +64,11 @@
                     </div>
                     
                     <div>
-                        <label for="edit_keterangan" class="block text-sm font-medium text-gray-700 mb-2">
+                        <label for="edit_keterangan" class="block text-sm font-medium text-gray-700 dark:text-gray-400 mb-2">
                             Keterangan <span class="text-gray-400 text-xs">(Opsional)</span>
                         </label>
                         <textarea id="edit_keterangan" name="keterangan" rows="4" 
-                            class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 resize-none" 
+                            class="w-full dark:bg-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-700 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 resize-none" 
                             placeholder="Tambahkan keterangan untuk transaksi ini..."></textarea>
                     </div>
                 </div>
@@ -76,15 +76,15 @@
         </div>
         
         {{-- Footer dengan Tombol - Fixed --}}
-        <div class="flex-shrink-0 px-6 py-4 bg-gray-50 border-t border-gray-100 rounded-b-2xl">
+        <div class="flex-shrink-0 px-6 py-4 bg-gray-50 dark:bg-gray-700 border-t border-gray-100 dark:border-gray-700 rounded-b-2xl">
             <div class="flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-3 space-y-3 space-y-reverse sm:space-y-0">
                 <button type="button" onclick="closeEditModal()" 
-                    class="w-full sm:w-auto px-6 py-2.5 bg-white border border-gray-300 text-gray-700 font-medium text-sm rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-200 transition-all duration-200">
+                    class="w-full sm:w-auto px-6 py-2.5 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-400 font-medium text-sm rounded-lg hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:focus:ring-gray-600 transition-all duration-200">
                     <i class="fa-solid fa-times mr-2"></i>
                     Batal
                 </button>
                 <button type="submit" form="editTabunganForm"
-                    class="w-full sm:w-auto px-6 py-2.5 bg-indigo-600 text-white font-medium text-sm rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-all duration-200">
+                    class="w-full sm:w-auto px-6 py-2.5 bg-indigo-600 dark:bg-indigo-500 text-white font-medium text-sm rounded-lg hover:bg-indigo-700 dark:hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-all duration-200">
                     <i class="fa-solid fa-save mr-2"></i>
                     Update Tabungan
                 </button>

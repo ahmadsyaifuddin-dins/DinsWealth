@@ -1,7 +1,7 @@
 <!-- Success Message -->
 @if (session('success'))
 <div class="mb-6 relative overflow-hidden">
-    <div class="success-message bg-gradient-to-r from-green-50 to-emerald-50 border-l-4 border-green-500 rounded-xl p-4 shadow-lg transform transition-all duration-500 hover:shadow-xl">
+    <div class="success-message bg-gradient-to-r from-green-50 dark:from-green-900 to-emerald-50 dark:to-emerald-900 border-l-4 border-green-500 dark:border-green-500 rounded-xl p-4 shadow-lg transform transition-all duration-500 hover:shadow-xl">
         <div class="flex items-start">
             <div class="flex-shrink-0">
                 <div class="w-10 h-10 bg-green-500 rounded-full flex items-center justify-center animate-pulse">
@@ -34,7 +34,7 @@
 <!-- Error Messages -->
 @if ($errors->any())
 <div class="mb-6 relative overflow-hidden">
-    <div class="error-message bg-gradient-to-r from-red-50 to-pink-50 border-l-4 border-red-500 rounded-xl p-4 shadow-lg transform transition-all duration-500 hover:shadow-xl">
+    <div class="error-message bg-gradient-to-r from-red-50 dark:from-red-900 to-pink-50 dark:to-pink-900 border-l-4 border-red-500 dark:border-red-500 rounded-xl p-4 shadow-lg transform transition-all duration-500 hover:shadow-xl">
         <div class="flex items-start">
             <div class="flex-shrink-0">
                 <div class="w-10 h-10 bg-red-500 rounded-full flex items-center justify-center animate-bounce">
@@ -76,7 +76,7 @@
 <!-- Individual Field Errors (Alternative) -->
 @error('nama')
 <div class="mb-4 relative overflow-hidden">
-    <div class="field-error bg-gradient-to-r from-red-50 to-red-100 border border-red-200 rounded-lg p-3 shadow-sm">
+    <div class="field-error bg-gradient-to-r from-red-50 dark:from-red-900 to-red-100 dark:to-red-900 border border-red-200 dark:border-red-900 rounded-lg p-3 shadow-sm">
         <div class="flex items-center">
             <div class="w-8 h-8 bg-red-100 rounded-full flex items-center justify-center mr-3">
                 <svg class="w-4 h-4 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -98,7 +98,7 @@
 
 @error('jenis')
 <div class="mb-4 relative overflow-hidden">
-    <div class="field-error bg-gradient-to-r from-red-50 to-red-100 border border-red-200 rounded-lg p-3 shadow-sm">
+    <div class="field-error bg-gradient-to-r from-red-50 dark:from-red-900 to-red-100 dark:to-red-900 border border-red-200 dark:border-red-900 rounded-lg p-3 shadow-sm">
         <div class="flex items-center">
             <div class="w-8 h-8 bg-red-100 rounded-full flex items-center justify-center mr-3">
                 <svg class="w-4 h-4 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -120,7 +120,7 @@
 
 @error('nominal')
 <div class="mb-4 relative overflow-hidden">
-    <div class="field-error bg-gradient-to-r from-red-50 to-red-100 border border-red-200 rounded-lg p-3 shadow-sm">
+    <div class="field-error bg-gradient-to-r from-red-50 dark:from-red-900 to-red-100 dark:to-red-900 border border-red-200 dark:border-red-900 rounded-lg p-3 shadow-sm">
         <div class="flex items-center">
             <div class="w-8 h-8 bg-red-100 rounded-full flex items-center justify-center mr-3">
                 <svg class="w-4 h-4 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -143,7 +143,7 @@
 <!-- Info Message (Bonus) -->
 @if (session('info'))
 <div class="mb-6 relative overflow-hidden">
-    <div class="info-message bg-gradient-to-r from-blue-50 to-indigo-50 border-l-4 border-blue-500 rounded-xl p-4 shadow-lg transform transition-all duration-500 hover:shadow-xl">
+    <div class="info-message bg-gradient-to-r from-blue-50 dark:from-blue-900 to-indigo-50 dark:to-indigo-900 border-l-4 border-blue-500 dark:border-blue-500 rounded-xl p-4 shadow-lg transform transition-all duration-500 hover:shadow-xl">
         <div class="flex items-start">
             <div class="flex-shrink-0">
                 <div class="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center animate-pulse">
@@ -176,7 +176,7 @@
 <!-- Warning Message (Bonus) -->
 @if (session('warning'))
 <div class="mb-6 relative overflow-hidden">
-    <div class="warning-message bg-gradient-to-r from-yellow-50 to-orange-50 border-l-4 border-yellow-500 rounded-xl p-4 shadow-lg transform transition-all duration-500 hover:shadow-xl">
+    <div class="warning-message bg-gradient-to-r from-yellow-50 dark:from-yellow-900 to-orange-50 dark:to-orange-900 border-l-4 border-yellow-500 dark:border-yellow-500 rounded-xl p-4 shadow-lg transform transition-all duration-500 hover:shadow-xl">
         <div class="flex items-start">
             <div class="flex-shrink-0">
                 <div class="w-10 h-10 bg-yellow-500 rounded-full flex items-center justify-center animate-pulse">

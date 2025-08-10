@@ -34,7 +34,7 @@
             <div class="flex items-start">
                 <div class="flex-shrink-0 mr-4">
                     <div class="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
-                        <span class="text-2xl">💡</span>
+                        <i class="fas fa-lightbulb text-2xl text-yellow-400 dark:text-yellow-300 dark:drop-shadow-[0_0_8px_rgba(255,255,150,0.9)]"></i>
                     </div>
                 </div>
                 <div class="flex-1">

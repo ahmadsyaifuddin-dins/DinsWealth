@@ -2,11 +2,11 @@
     @csrf
     <div class="space-y-4">
         <div>
-            <label for="format" class="block text-sm font-bold text-gray-700 mb-3">
+            <label for="format" class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-3">
                 <i class="fas fa-file-export mr-2 text-blue-600"></i>
                 Pilih Format Export:
             </label>
-            <select name="format" id="format" class="w-full px-4 py-4 bg-gray-50 border-2 border-gray-200 rounded-2xl focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-all duration-300 font-medium text-gray-700" required>
+            <select name="format" id="format" class="w-full px-4 py-4 bg-gray-50 dark:bg-slate-700 border-2 border-gray-200 dark:border-slate-600 rounded-2xl focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-all duration-300 font-medium text-gray-700 dark:text-gray-300" required>
                 <option value="" class="text-gray-400">-- Pilih Format --</option>
                 <option value="json">📄 JSON (Data Lengkap)</option>
                 <option value="csv">📊 CSV (Excel Compatible)</option>
@@ -19,13 +19,16 @@
         </button>
     </div>
     
-    <div class="mt-4 p-4 bg-gradient-to-r from-blue-50 to-cyan-50 rounded-2xl border border-blue-100">
-        <div class="flex items-start text-blue-800 text-sm">
-            <i class="fas fa-info-circle mr-3 mt-0.5 text-blue-600"></i>
-            <div>
-                <p class="font-semibold mb-1">Tips Backup:</p>
-                <p class="text-xs text-blue-700">Lakukan backup secara berkala untuk menjaga keamanan data keuanganmu</p>
-            </div>
+    <div class="mt-4 p-4 bg-gradient-to-r from-blue-50 to-cyan-50 rounded-2xl border border-blue-100 text-blue-800 text-sm
+    dark:bg-gradient-to-r dark:from-slate-800 dark:to-slate-900 dark:border-slate-600 dark:text-blue-300">
+    <div class="flex items-start">
+        <i class="fas fa-info-circle mr-3 mt-0.5 text-blue-600 dark:text-blue-300"></i>
+        <div>
+            <p class="font-semibold mb-1">Tips Backup:</p>
+            <p class="text-xs text-blue-700 dark:text-blue-300">
+                Lakukan backup secara berkala untuk menjaga keamanan data keuanganmu
+            </p>
         </div>
     </div>
+</div>
 </form>
