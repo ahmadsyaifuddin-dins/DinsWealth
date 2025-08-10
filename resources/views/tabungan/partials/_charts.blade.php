@@ -27,15 +27,15 @@
                     Riwayat Arus Kas
                 </h4>
                 <div class="flex justify-center sm:justify-end">
-                    <div class="inline-flex bg-gray-100 dark:bg-gray-700 p-1 rounded-lg w-full sm:w-auto max-w-xs sm:max-w-none">
-                        <button id="lineChartHourlyBtn" class="flex-1 sm:flex-none px-3 py-2 text-xs sm:text-sm font-medium rounded-md text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 transition-colors">
+                    <div class="inline-flex bg-gray-100 dark:bg-gray-700 p-1 rounded-lg w-full sm:w-auto max-w-xs sm:max-w-none border dark:border-gray-600">
+                        <button id="lineChartHourlyBtn" class="flex-1 sm:flex-none px-3 py-2 text-xs sm:text-sm font-medium rounded-md text-gray-600 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-gray-50 dark:hover:bg-gray-600 transition-all duration-200">
                             <span class="sm:hidden">Jam</span>
                             <span class="hidden sm:inline">Per Jam</span>
                         </button>
-                        <button id="lineChartDailyBtn" class="flex-1 sm:flex-none px-3 py-2 text-xs sm:text-sm font-medium rounded-md bg-white dark:bg-gray-600 text-indigo-600 dark:text-indigo-400 shadow">
+                        <button id="lineChartDailyBtn" class="flex-1 sm:flex-none px-3 py-2 text-xs sm:text-sm font-medium rounded-md bg-indigo-600 text-white shadow-md dark:bg-indigo-500 dark:text-white transform scale-105 transition-all duration-200">
                             Harian
                         </button>
-                        <button id="lineChartMonthlyBtn" class="flex-1 sm:flex-none px-3 py-2 text-xs sm:text-sm font-medium rounded-md text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 transition-colors">
+                        <button id="lineChartMonthlyBtn" class="flex-1 sm:flex-none px-3 py-2 text-xs sm:text-sm font-medium rounded-md text-gray-600 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-gray-50 dark:hover:bg-gray-600 transition-all duration-200">
                             <span class="sm:hidden">Bulan</span>
                             <span class="hidden sm:inline">Bulanan</span>
                         </button>

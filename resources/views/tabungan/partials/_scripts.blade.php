@@ -70,7 +70,7 @@
         }
         if (exportExcelBtn) {
             exportExcelBtn.addEventListener('click', () => handleExport(
-            '{{ route('tabungan.export.excel') }}'));
+                '{{ route('tabungan.export.excel') }}'));
         }
 
         // --- Inisialisasi Grafik ---
@@ -149,6 +149,7 @@
                 }
             });
 
+            // JavaScript untuk update line chart dengan styling button yang diperbaiki
             function updateLineChart(mode) {
                 let newData;
                 switch (mode) {
@@ -165,24 +166,52 @@
 
                 if (!newData || !lineChartInstance) return;
 
+                // Update chart data
                 lineChartInstance.data.labels = newData.labels;
                 lineChartInstance.data.datasets[0].data = newData.data;
                 lineChartInstance.update();
 
+                // Handle styling button dengan dark mode
                 const buttons = {
                     hourly: hourlyBtn,
                     daily: dailyBtn,
                     monthly: monthlyBtn
                 };
+
                 for (const key in buttons) {
+                    const btn = buttons[key];
                     const isActive = key === mode;
-                    buttons[key].classList.toggle('bg-white', isActive);
-                    buttons[key].classList.toggle('text-indigo-600', isActive);
-                    buttons[key].classList.toggle('shadow', isActive);
-                    buttons[key].classList.toggle('text-gray-600', !isActive);
+
+                    // Reset semua classes
+                    btn.className =
+                        'flex-1 sm:flex-none px-3 py-2 text-xs sm:text-sm font-medium rounded-md transition-all duration-200';
+
+                    if (isActive) {
+                        // Active state - lebih kontras dan jelas
+                        btn.classList.add(
+                            'bg-indigo-600',
+                            'text-white',
+                            'shadow-md',
+                            'dark:bg-indigo-500',
+                            'dark:text-white',
+                            'transform',
+                            'scale-105'
+                        );
+                    } else {
+                        // Inactive state
+                        btn.classList.add(
+                            'text-gray-600',
+                            'dark:text-gray-300',
+                            'hover:text-indigo-600',
+                            'dark:hover:text-indigo-400',
+                            'hover:bg-gray-50',
+                            'dark:hover:bg-gray-600'
+                        );
+                    }
                 }
             }
 
+            // Event listeners
             hourlyBtn.addEventListener('click', () => updateLineChart('hourly'));
             dailyBtn.addEventListener('click', () => updateLineChart('daily'));
             monthlyBtn.addEventListener('click', () => updateLineChart('monthly'));
