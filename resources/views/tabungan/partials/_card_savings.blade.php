@@ -6,7 +6,7 @@
         </div>
         <div>
             <p class="text-sm text-gray-500 dark:text-gray-400">Total Pemasukan</p>
-            <p class="text-2xl font-bold text-green-600 dark:text-green-700">Rp{{ number_format($totalPemasukan, 0, ',', '.') }}
+            <p class="text-2xl font-bold text-green-600 dark:text-green-500 dark:drop-shadow-[0_0_10px_rgba(255,255,200,0.3)]">Rp{{ number_format($totalPemasukan, 0, ',', '.') }}
             </p>
         </div>
     </div>
@@ -17,7 +17,7 @@
         </div>
         <div>
             <p class="text-sm text-gray-500 dark:text-gray-400">Total Pengeluaran</p>
-            <p class="text-2xl font-bold text-red-600 dark:text-red-700">Rp{{ number_format($totalPengeluaran, 0, ',', '.') }}
+            <p class="text-2xl font-bold text-red-600 dark:text-red-500 dark:drop-shadow-[0_0_10px_rgba(255,255,200,0.3)]">Rp{{ number_format($totalPengeluaran, 0, ',', '.') }}
             </p>
         </div>
     </div>
@@ -28,7 +28,7 @@
         </div>
         <div>
             <p class="text-sm text-gray-500 dark:text-gray-400">Saldo Akhir</p>
-            <p class="text-2xl font-bold text-indigo-600 dark:text-indigo-700">Rp{{ number_format($saldoAkhir, 0, ',', '.') }}
+            <p class="text-2xl font-bold text-indigo-600 dark:text-indigo-500 dark:drop-shadow-[0_0_10px_rgba(255,255,200,0.3)]">Rp{{ number_format($saldoAkhir, 0, ',', '.') }}
             </p>
         </div>
     </div>

@@ -20,36 +20,39 @@ $user = Auth::user();
                     <x-nav-link :href="route('admin.dashboard')" :active="request()->routeIs('admin.dashboard')" class="text-gray-700 dark:text-gray-200 hover:text-gray-900 dark:hover:text-white {{ request()->routeIs('admin.dashboard') ? 'border-b-2 border-blue-500 text-blue-600 dark:text-blue-400' : 'border-b-2 border-transparent' }}">
                         {{ __('Dashboard Admin') }}
                     </x-nav-link>
+                    
                     @if(Auth::user()->role === 'dins')
-                <div class="hidden sm:flex sm:items-center sm:ml-6">
-                    <x-dropdown align="left" width="48">
-                        <x-slot name="trigger">
-                            <button class="inline-flex items-center px-3 py-2 text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-gray-100 transition-colors">
-                                <div>Master Kategori</div>
-                                <div class="ml-1">
-                                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                                        <path fill-rule="evenodd"
-                                            d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0L5.293 8.707a1 1 0 010-1.414z"
-                                            clip-rule="evenodd" />
-                                    </svg>
-                                </div>
-                            </button>
-                        </x-slot>
+                    <div class="hidden sm:flex sm:items-center sm:ml-6">
+                        <x-dropdown align="left" width="48">
+                            <x-slot name="trigger">
+                                <button class="inline-flex items-center px-3 py-2 text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-gray-100 transition-colors">
+                                    <div>Master Kategori</div>
+                                    <div class="ml-1">
+                                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd"
+                                                d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0L5.293 8.707a1 1 0 010-1.414z"
+                                                clip-rule="evenodd" />
+                                        </svg>
+                                    </div>
+                                </button>
+                            </x-slot>
 
-                        <x-slot name="content">
-                            <x-dropdown-link :href="route('kategori.nama.index')">
-                                Kategori Nama Tabungan
-                            </x-dropdown-link>
-                            <x-dropdown-link :href="route('kategori.jenis.index')">
-                                Kategori Jenis Tabungan
-                            </x-dropdown-link>
-                        </x-slot>
-                    </x-dropdown>
-                </div>
-                @endif
+                            <x-slot name="content">
+                                <x-dropdown-link :href="route('kategori.nama.index')">
+                                    Kategori Nama Tabungan
+                                </x-dropdown-link>
+                                <x-dropdown-link :href="route('kategori.jenis.index')">
+                                    Kategori Jenis Tabungan
+                                </x-dropdown-link>
+                            </x-slot>
+                        </x-dropdown>
+                    </div>
+                    @endif
+                    
                     <x-nav-link :href="route('tabungan.index')" :active="request()->routeIs('tabungan.*')" class="text-gray-700 dark:text-gray-200 hover:text-gray-900 dark:hover:text-white {{ request()->routeIs('tabungan.*') ? 'border-b-2 border-blue-500 text-blue-600 dark:text-blue-400' : 'border-b-2 border-transparent' }}">
                         {{ __('Tabungan') }}
                     </x-nav-link>
+                    
                     @elseif(Auth::user()->role === 'viewer')
                     <x-nav-link :href="route('viewer.dashboard')" :active="request()->routeIs('viewer.dashboard')" class="text-gray-700 dark:text-gray-200 hover:text-gray-900 dark:hover:text-white {{ request()->routeIs('viewer.dashboard') ? 'border-b-2 border-blue-500 text-blue-600 dark:text-blue-400' : 'border-b-2 border-transparent' }}">
                         {{ __('Dashboard') }}
@@ -58,6 +61,7 @@ $user = Auth::user();
                         {{ __('Tabungan') }}
                     </x-nav-link>
                     @endif
+                    
                     @if(Auth::user()->role === 'dins')
                     <x-nav-link :href="route('planned-transactions.index')" :active="request()->routeIs('planned-transactions.*')" class="text-gray-700 dark:text-gray-200 hover:text-gray-900 dark:hover:text-white {{ request()->routeIs('planned-transactions.*') ? 'border-b-2 border-blue-500 text-blue-600 dark:text-blue-400' : 'border-b-2 border-transparent' }}">
                         {{ __('Transaksi Terencana') }}
@@ -68,13 +72,8 @@ $user = Auth::user();
 
             <!-- Right Side Items -->
             <div class="flex items-center space-x-3">
-                <!-- Dark Mode Toggle -->
-                <button id="darkModeToggle" 
-                        class="p-2 rounded-lg text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-700 transition-all duration-200" 
-                        title="Toggle Dark Mode">
-                    <i class="fa-solid fa-moon dark:hidden text-lg"></i>
-                    <i class="fa-solid fa-sun hidden dark:inline text-lg"></i>
-                </button>
+                <!-- Enhanced Theme Toggle Component -->
+                <x-theme-toggle />
 
                 <!-- Settings Dropdown -->
                 <div class="hidden sm:flex sm:items-center">
@@ -163,6 +162,7 @@ $user = Auth::user();
             <x-responsive-nav-link :href="route('tabungan.index')" :active="request()->routeIs('tabungan.*')" class="text-gray-800 dark:text-gray-200 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700 {{ request()->routeIs('tabungan.*') ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 border-l-4 border-blue-500' : '' }}">
                 {{ __('Tabungan') }}
             </x-responsive-nav-link>
+            
             @if(Auth::user()->role === 'dins')
             <x-responsive-nav-link :href="route('planned-transactions.index')" :active="request()->routeIs('planned-transactions.*')" class="text-gray-800 dark:text-gray-200 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700 {{ request()->routeIs('planned-transactions.*') ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 border-l-4 border-blue-500' : '' }}">
                 {{ __('Transaksi Terencana') }}
@@ -203,3 +203,6 @@ $user = Auth::user();
         </div>
     </div>
 </nav>
+
+<!-- Include the dark mode toggle script -->
+<script src="{{ asset('js/dark-mode-toggle.js') }}" defer></script>
