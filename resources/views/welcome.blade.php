@@ -67,17 +67,20 @@
         </div>
 
         <!-- Footer -->
-        <div class="mt-8 text-center text-gray-400 dark:text-gray-500 text-sm">
+        <div class="mt-8 text-center text-gray-700 dark:text-gray-500 text-sm">
             <div class="flex items-center justify-center space-x-4">
                 <span class="flex items-center">
-                    <i class="fas fa-shield-alt mr-1"></i>
+                    <i class="fas fa-shield-alt mr-1 text-indigo-600"></i>
                     Pribadi & Aman
                 </span>
                 <span>•</span>
                 <span class="flex items-center">
-                    <i class="fas fa-heart mr-1"></i>
+                    <i class="fas fa-heart mr-1 text-red-600"></i>
                     Made for Personal Use
                 </span>
+            </div>
+            <div class="items-center mt-3">
+                Copyright &copy; <span class="font-bold"> 2025 20 Juli - {{ date('Y') }} </span> DinsWealth <span> Dev by <a href="https://github.com/ahmadsyaifuddin-dins" target="_blank" class="text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300 dark:drop-shadow-[0_0_15px_rgba(255,255,255)]">Ahmad Syaifuddin</a></span> 
             </div>
         </div>
     </div>
