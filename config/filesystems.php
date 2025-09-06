@@ -39,9 +39,18 @@ return [
         'public' => [
             'driver' => 'local',
             'root' => storage_path('app/public'),
-            'url' => env('APP_URL').'/storage',
+            'url' => env('APP_URL') . '/storage',
             'visibility' => 'public',
             'throw' => false,
+        ],
+
+        'hosting_public' => [
+            'driver' => 'local',
+            // dirname(base_path()) akan mengarah ke direktori di atas folder proyek Anda.
+            // Sesuaikan 'htdocs' dengan nama folder publik di hosting Anda (bisa juga 'public_html')
+            'root' => dirname(base_path()) . '/htdocs',
+            'url' => env('APP_URL'), // URL utama website Anda
+            'visibility' => 'public',
         ],
 
         's3' => [

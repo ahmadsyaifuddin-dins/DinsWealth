@@ -2,14 +2,16 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Tabungan;
-use App\Models\KategoriNamaTabungan;
+use App\Exports\TabunganExport;
 use App\Models\KategoriJenisTabungan;
+use App\Models\KategoriNamaTabungan;
+use App\Models\Tabungan;
+use App\Models\TabunganImage;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Barryvdh\DomPDF\Facade\Pdf;
-use App\Exports\TabunganExport;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use Maatwebsite\Excel\Facades\Excel;
 
 class TabunganController extends Controller
@@ -54,7 +56,7 @@ class TabunganController extends Controller
     private function getFilteredQuery(Request $request)
     {
         $user = auth()->user();
-        $query = Tabungan::with(['user', 'kategoriNama', 'kategoriJenis']);
+        $query = Tabungan::with(['user', 'kategoriNama', 'kategoriJenis', 'images']);
 
         // Terapkan semua filter
         if ($request->filled('tanggal_mulai')) {
@@ -74,98 +76,167 @@ class TabunganController extends Controller
             $query->where('keterangan', 'like', "%{$search}%");
         }
 
-        // Aturan Role
-        //  if ($user->role === 'viewer') {
-        // //      $query->where('user_id', $user->id);
-        //  } elseif ($user->role !== 'dins') {
-        //      abort(403);
-        //  }
-
         return $query->latest();
     }
 
     public function index(Request $request)
     {
         // =================================================================
-        // 1. DATA UNTUK TABEL & TOTAL (SESUAI FILTER DARI USER) - Tetap sama
+        // 1. DATA UNTUK TABEL & TOTAL (SESUAI FILTER DARI USER)
         // =================================================================
-        $data = $this->getFilteredQuery($request)->get();
         $user = Auth::user();
+
+        // Mulai query dasar
+        $query = Tabungan::with(['user', 'kategoriNama', 'kategoriJenis', 'images']);
+
+        // Terapkan filter berdasarkan input dari request (URL)
+
+        // 1. Filter berdasarkan rentang tanggal
+        if ($request->filled('tanggal_mulai')) {
+            $query->whereDate('created_at', '>=', $request->tanggal_mulai);
+        }
+        if ($request->filled('tanggal_selesai')) {
+            $query->whereDate('created_at', '<=', $request->tanggal_selesai);
+        }
+
+        // 2. Filter berdasarkan jenis (ID dari kategori jenis)
+        if ($request->filled('jenis')) {
+            $query->where('jenis', $request->jenis);
+        }
+
+        // 3. Filter berdasarkan kategori (ID dari kategori nama)
+        if ($request->filled('kategori')) {
+            $query->where('nama', $request->kategori);
+        }
+
+        // 4. Filter berdasarkan kata kunci di keterangan
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where('keterangan', 'like', "%{$search}%");
+        }
+
+        // Ambil data SETELAH semua kondisi diterapkan
+        $data = $query->latest()->get();
+
+        // =======================================================
+        // PERSIAPAN DATA UNTUK GRAFIK (MENGIKUTI FILTER)
+        // =======================================================
+        $chartData = [];
+        if ($data->isNotEmpty()) {
+            // 1. Data untuk Pie Chart (Pemasukan vs Pengeluaran) - DARI DATA YANG SUDAH DIFILTER
+            $totalPemasukan = $data->where('kategoriJenis.jenis', 'Pemasukan')->sum('nominal');
+            $totalPengeluaran = $data->where('kategoriJenis.jenis', 'Pengeluaran')->sum('nominal');
+            $chartData['pie'] = [$totalPemasukan, $totalPengeluaran];
+
+            // 2. Data untuk Line Chart (Riwayat per bulan) - DARI DATA YANG SUDAH DIFILTER
+            $lineChartData = $data->sortBy('created_at')
+                ->groupBy(function ($item) {
+                    return $item->created_at->format('Y-m'); // Grup berdasarkan Tahun-Bulan
+                })
+                ->map(function ($group) {
+                    $pemasukan = $group->where('kategoriJenis.jenis', 'Pemasukan')->sum('nominal');
+                    $pengeluaran = $group->where('kategoriJenis.jenis', 'Pengeluaran')->sum('nominal');
+                    return $pemasukan - $pengeluaran; // Hitung arus kas bersih
+                });
+
+            $chartData['line'] = [
+                'labels' => $lineChartData->keys()->map(function ($date) {
+                    // Format label menjadi "Nama Bulan Tahun"
+                    return \Carbon\Carbon::createFromFormat('Y-m', $date)->isoFormat('MMMM Y');
+                }),
+                'data' => $lineChartData->values(),
+            ];
+
+            // 3. Data untuk Bar Chart (Kategori paling sering) - DARI DATA YANG SUDAH DIFILTER
+            $barChartData = $data->where('kategoriJenis.jenis', 'Pengeluaran') // Fokus pada pengeluaran
+                ->countBy('kategoriNama.nama')
+                ->sortDesc()
+                ->take(5); // Ambil 5 teratas
+
+            $chartData['bar'] = [
+                'labels' => $barChartData->keys(),
+                'data' => $barChartData->values(),
+            ];
+
+            // 4. Data untuk Line Chart Bulanan - DARI DATA YANG SUDAH DIFILTER
+            $lineChartBulanan = $data->sortBy('created_at')
+                ->groupBy(function ($item) {
+                    return $item->created_at->format('Y-m');
+                })
+                ->map(function ($group) {
+                    $pemasukan = $group->where('kategoriJenis.jenis', 'Pemasukan')->sum('nominal');
+                    $pengeluaran = $group->where('kategoriJenis.jenis', 'Pengeluaran')->sum('nominal');
+                    return $pemasukan - $pengeluaran;
+                });
+
+            $chartData['line_monthly'] = [
+                'labels' => $lineChartBulanan->keys()->map(function ($date) {
+                    return \Carbon\Carbon::createFromFormat('Y-m', $date)->isoFormat('MMMM Y');
+                }),
+                'data' => $lineChartBulanan->values(),
+            ];
+
+            // 5. Data untuk Line Chart Harian (30 hari terakhir dari data yang difilter)
+            $dataHarian = $data->filter(function ($item) {
+                return $item->created_at >= now()->subDays(29)->startOfDay();
+            })
+                ->sortBy('created_at')
+                ->groupBy(function ($item) {
+                    return $item->created_at->format('Y-m-d');
+                })
+                ->map(function ($group) {
+                    $pemasukan = $group->where('kategoriJenis.jenis', 'Pemasukan')->sum('nominal');
+                    $pengeluaran = $group->where('kategoriJenis.jenis', 'Pengeluaran')->sum('nominal');
+                    return $pemasukan - $pengeluaran;
+                });
+
+            $chartData['line_daily'] = [
+                'labels' => $dataHarian->keys()->map(function ($date) {
+                    return \Carbon\Carbon::createFromFormat('Y-m-d', $date)->isoFormat('D MMM');
+                }),
+                'data' => $dataHarian->values(),
+            ];
+
+            // 6. Data untuk Line Chart Per Jam (hari ini dari data yang difilter)
+            $dataJamIni = $data->filter(function ($item) {
+                return $item->created_at->isToday();
+            })
+                ->sortBy('created_at')
+                ->groupBy(function ($item) {
+                    return $item->created_at->format('H');
+                })
+                ->map(function ($group) {
+                    $pemasukan = $group->where('kategoriJenis.jenis', 'Pemasukan')->sum('nominal');
+                    $pengeluaran = $group->where('kategoriJenis.jenis', 'Pengeluaran')->sum('nominal');
+                    return $pemasukan - $pengeluaran;
+                });
+
+            // Buat array 24 jam (0-23) dengan default 0
+            $hourlyData = array_fill(0, 24, 0);
+            foreach ($dataJamIni as $hour => $netFlow) {
+                $hourlyData[(int)$hour] = $netFlow;
+            }
+
+            $chartData['line_hourly'] = [
+                'labels' => array_map(fn($h) => str_pad($h, 2, '0', STR_PAD_LEFT) . ':00', array_keys($hourlyData)),
+                'data' => array_values($hourlyData),
+            ];
+        }
+
+        // ===============================================
+        // HITUNG TOTAL UNTUK DASHBOARD (DARI DATA YANG SUDAH DIFILTER)
+        // ===============================================
         $totalPemasukan = $data->where('kategoriJenis.jenis', 'Pemasukan')->sum('nominal');
         $totalPengeluaran = $data->where('kategoriJenis.jenis', 'Pengeluaran')->sum('nominal');
         $saldoAkhir = $totalPemasukan - $totalPengeluaran;
 
         // =================================================================
-        // 2. AMBIL DATA KHUSUS UNTUK GRAFIK (QUERY DIPERBARUI & LEBIH STABIL)
-        // =================================================================
-        $chartData = [];
-
-        // Data untuk Pie Chart (menggunakan JOIN)
-        $pieData = Tabungan::select(
-            'kategori_jenis_tabungans.jenis',
-            DB::raw('SUM(tabungans.nominal) as total_nominal')
-        )
-            ->join('kategori_jenis_tabungans', 'tabungans.jenis', '=', 'kategori_jenis_tabungans.id')
-            ->groupBy('kategori_jenis_tabungans.jenis')
-            ->pluck('total_nominal', 'jenis');
-
-        $chartData['pie'] = [
-            $pieData->get('Pemasukan', 0),
-            $pieData->get('Pengeluaran', 0)
-        ];
-
-        // Data untuk Bar Chart (menggunakan JOIN)
-        $barChartData = Tabungan::select(
-            'kategori_nama_tabungans.nama',
-            DB::raw('COUNT(*) as total_transaksi')
-        )
-            ->join('kategori_jenis_tabungans', 'tabungans.jenis', '=', 'kategori_jenis_tabungans.id')
-            ->join('kategori_nama_tabungans', 'tabungans.nama', '=', 'kategori_nama_tabungans.id')
-            ->where('kategori_jenis_tabungans.jenis', 'Pengeluaran')
-            ->groupBy('kategori_nama_tabungans.nama')
-            ->orderBy('total_transaksi', 'desc')
-            ->take(5)
-            ->pluck('total_transaksi', 'nama');
-
-        $chartData['bar'] = [
-            'labels' => $barChartData->keys(),
-            'data'   => $barChartData->values(),
-        ];
-
-        // Data untuk Line Chart (Bulanan - selectRaw sudah stabil)
-        $lineChartBulanan = Tabungan::selectRaw("DATE_FORMAT(created_at, '%Y-%m') as month, SUM(CASE WHEN jenis = (SELECT id FROM kategori_jenis_tabungans WHERE jenis = 'Pemasukan') THEN nominal ELSE -nominal END) as net_flow")
-            ->groupBy('month')->orderBy('month', 'asc')->get();
-        $chartData['line_monthly'] = [
-            'labels' => $lineChartBulanan->map(fn($item) => \Carbon\Carbon::createFromFormat('Y-m', $item->month)->isoFormat('MMMM Y')),
-            'data'   => $lineChartBulanan->pluck('net_flow'),
-        ];
-
-        // Data untuk Line Chart (Harian - selectRaw sudah stabil)
-        $lineChartHarian = Tabungan::selectRaw("DATE(created_at) as day, SUM(CASE WHEN jenis = (SELECT id FROM kategori_jenis_tabungans WHERE jenis = 'Pemasukan') THEN nominal ELSE -nominal END) as net_flow")
-            ->where('created_at', '>=', now()->subDays(29)->startOfDay())->groupBy('day')->orderBy('day', 'asc')->get();
-        $chartData['line_daily'] = [
-            'labels' => $lineChartHarian->map(fn($item) => \Carbon\Carbon::parse($item->day)->isoFormat('D MMM')),
-            'data'   => $lineChartHarian->pluck('net_flow'),
-        ];
-
-        // Data untuk Line Chart (Per Jam - selectRaw sudah stabil)
-        $hourlyFlows = Tabungan::selectRaw("HOUR(created_at) as hour, SUM(CASE WHEN jenis = (SELECT id FROM kategori_jenis_tabungans WHERE jenis = 'Pemasukan') THEN nominal ELSE -nominal END) as net_flow")
-            ->whereDate('created_at', today())->groupBy('hour')->orderBy('hour', 'asc')->pluck('net_flow', 'hour');
-        $hourlyData = array_fill(0, 24, 0);
-        foreach ($hourlyFlows as $hour => $net_flow) {
-            $hourlyData[$hour] = $net_flow;
-        }
-        $chartData['line_hourly'] = [
-            'labels' => array_map(fn($h) => str_pad($h, 2, '0', STR_PAD_LEFT) . ':00', array_keys($hourlyData)),
-            'data'   => array_values($hourlyData),
-        ];
-
-        // =================================================================
-        // 3. AMBIL DATA UNTUK DROPDOWN & KIRIM KE VIEW
+        // AMBIL DATA UNTUK DROPDOWN & KIRIM KE VIEW
         // =================================================================
         $namaKategori = KategoriNamaTabungan::all();
         $jenisKategori = KategoriJenisTabungan::all();
 
+        // Kirim semua data ke view, termasuk data grafik
         return view('tabungan.index', compact(
             'data',
             'user',
@@ -178,23 +249,19 @@ class TabunganController extends Controller
         ));
     }
 
-      /**
-     * TAMBAHKAN METHOD SHOW YANG HILANG
-     * Method ini diperlukan jika menggunakan resource route
-     */
-    // public function show(Tabungan $tabungan)
-    // {
-    //     // Load relasi yang diperlukan
-    //     $tabungan->load(['kategoriNama', 'kategoriJenis', 'user']);
-        
-    //     return view('tabungan.show', compact('tabungan'));
-    // }
-
     public function create()
     {
         $namaKategori = KategoriNamaTabungan::all();
         $jenisKategori = KategoriJenisTabungan::all();
         return view('tabungan.create', compact('namaKategori', 'jenisKategori'));
+    }
+
+    // Fungsi helper untuk menentukan disk mana yang akan digunakan
+    private function getStorageDisk()
+    {
+        // Jika environment adalah 'local', gunakan disk 'public'.
+        // Jika tidak (misal: production di InfinityFree), gunakan disk 'hosting_public'.
+        return app()->environment('local') ? 'public' : 'hosting_public';
     }
 
     public function store(Request $request)
@@ -204,18 +271,30 @@ class TabunganController extends Controller
             'jenis' => 'required|exists:kategori_jenis_tabungans,id',
             'nominal' => 'required|string', // format-nya akan dibersihkan manual
             'keterangan' => 'nullable|string|max:255',
+            'images' => 'nullable|array', // Validasi bahwa 'images' adalah array
+            'images.*' => 'image|mimes:jpeg,png,jpg,gif|max:2048', // Validasi setiap item dalam array
         ]);
 
         // Bersihkan angka nominal dari titik/koma agar bisa disimpan sebagai integer
         $cleanedNominal = (int) str_replace(['.', ','], '', $validated['nominal']);
 
-        Tabungan::create([
-            'nama' => $validated['nama'],         // ini ID kategori nama tabungan
-            'jenis' => $validated['jenis'],       // ini ID kategori jenis tabungan
+        // Buat data tabungan terlebih dahulu
+        $tabungan = Tabungan::create([
+            'nama' => $validated['nama'],
+            'jenis' => $validated['jenis'],
             'nominal' => $cleanedNominal,
             'keterangan' => $validated['keterangan'],
-            'user_id' => auth()->id(),            // supaya tercatat siapa yang nabung
+            'user_id' => auth()->id(),
         ]);
+
+        // Jika ada gambar yang di-upload, loop dan simpan
+        if ($request->hasFile('images')) {
+            $disk = $this->getStorageDisk();
+            foreach ($request->file('images') as $file) {
+                $path = $file->store('tabungan_images', $disk);
+                $tabungan->images()->create(['path' => $path]);
+            }
+        }
 
         return redirect()->route('tabungan.index')->with('success', 'Tabungan berhasil ditambahkan.');
     }
@@ -236,17 +315,39 @@ class TabunganController extends Controller
             'jenis' => 'required|exists:kategori_jenis_tabungans,id',
             'nominal' => 'required|string',
             'keterangan' => 'nullable|string|max:255',
+            'images' => 'nullable|array',
+            'images.*' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
+            'deleted_images' => 'nullable|array', // Untuk menampung ID gambar yang mau dihapus
         ]);
 
         $cleanedNominal = (int) str_replace(['.', ','], '', $validated['nominal']);
 
         $tabungan = Tabungan::findOrFail($id);
+        $disk = $this->getStorageDisk();
+
         $tabungan->update([
             'nama' => $validated['nama'],
             'jenis' => $validated['jenis'],
             'nominal' => $cleanedNominal,
             'keterangan' => $validated['keterangan'],
         ]);
+
+        // Hapus gambar yang ditandai untuk dihapus
+        if (!empty($validated['deleted_images'])) {
+            $imagesToDelete = TabunganImage::whereIn('id', $validated['deleted_images'])->get();
+            foreach ($imagesToDelete as $image) {
+                Storage::disk($disk)->delete($image->path);
+                $image->delete();
+            }
+        }
+
+        // Tambahkan gambar baru jika ada
+        if ($request->hasFile('images')) {
+            foreach ($request->file('images') as $file) {
+                $path = $file->store('tabungan_images', $disk);
+                $tabungan->images()->create(['path' => $path]);
+            }
+        }
 
         return redirect()->route('tabungan.index')->with('success', 'Tabungan berhasil diupdate.');
     }
@@ -316,7 +417,14 @@ class TabunganController extends Controller
                 ->with('error', 'Anda tidak memiliki akses untuk menghapus permanen data tabungan!');
         }
 
-        $tabungan = Tabungan::onlyTrashed()->findOrFail($id);
+        $tabungan = Tabungan::onlyTrashed()->with('images')->findOrFail($id);
+        $disk = $this->getStorageDisk();
+
+        // Hapus semua file gambar terkait
+        foreach ($tabungan->images as $image) {
+            Storage::disk($disk)->delete($image->path);
+        }
+
         $tabungan->forceDelete();
 
         return redirect()->route('tabungan.trash')
@@ -341,9 +449,6 @@ class TabunganController extends Controller
             ->with('success', "Berhasil memulihkan {$count} data tabungan!");
     }
 
-    /**
-     * Hapus permanen semua data tabungan dari sampah
-     */
     public function emptyTrash()
     {
         // Cek apakah user memiliki role dins
@@ -352,8 +457,23 @@ class TabunganController extends Controller
                 ->with('error', 'Anda tidak memiliki akses untuk mengosongkan sampah tabungan!');
         }
 
-        $count = Tabungan::onlyTrashed()->count();
-        Tabungan::onlyTrashed()->forceDelete();
+        $disk = $this->getStorageDisk();
+
+        // 1. Ambil semua data yang ada di sampah beserta relasi gambarnya
+        $trashedTabungans = Tabungan::onlyTrashed()->with('images')->get();
+        $count = $trashedTabungans->count();
+
+        if ($count > 0) {
+            foreach ($trashedTabungans as $tabungan) {
+                // 2. Loop dan hapus setiap file gambar dari storage
+                foreach ($tabungan->images as $image) {
+                    Storage::disk($disk)->delete($image->path);
+                }
+                // 3. Hapus record dari database
+                // onDelete('cascade') akan otomatis menghapus record di 'tabungan_images'
+                $tabungan->forceDelete();
+            }
+        }
 
         return redirect()->route('tabungan.trash')
             ->with('success', "Berhasil menghapus permanen {$count} data tabungan dari database!");

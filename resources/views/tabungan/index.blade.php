@@ -84,10 +84,11 @@
     @push('scripts')
         @include('tabungan.partials._scripts')
     @endpush
-    
+
     {{-- Include semua modal --}}
     @include('tabungan.partials.modal-tabungan')
     @include('tabungan.partials.modal-tabungan-edit')
-    
+    @include('tabungan.partials.modal-show')
+
    
 </x-app-layout>

@@ -28,12 +28,15 @@
 
             <!-- Form Content -->
             <div class="p-8">
-                <form method="POST" action="{{ route('tabungan.store') }}" class="space-y-6">
+                <form method="POST" action="{{ route('tabungan.store') }}" class="space-y-6"
+                    enctype="multipart/form-data">
                     @csrf
 
                     <!-- Nama Tabungan -->
                     <div class="group">
-                        <label class="block text-gray-700 dark:text-gray-200 text-sm font-semibold mb-3 flex items-center" for="nama">
+                        <label
+                            class="block text-gray-700 dark:text-gray-200 text-sm font-semibold mb-3 flex items-center"
+                            for="nama">
                             <svg class="w-4 h-4 mr-2 text-indigo-500" fill="none" stroke="currentColor"
                                 viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -61,7 +64,9 @@
 
                     <!-- Jenis Tabungan -->
                     <div class="group">
-                        <label class="block text-gray-700 dark:text-gray-200 text-sm font-semibold mb-3 flex items-center" for="jenis">
+                        <label
+                            class="block text-gray-700 dark:text-gray-200 text-sm font-semibold mb-3 flex items-center"
+                            for="jenis">
                             <i class="fa-solid fa-list-alt mr-2 text-purple-500"></i>
                             Jenis Tabungan
                         </label>
@@ -87,7 +92,9 @@
 
                     <!-- Nominal -->
                     <div class="group">
-                        <label class="block text-gray-700 dark:text-gray-200 text-sm font-semibold mb-3 flex items-center" for="nominal">
+                        <label
+                            class="block text-gray-700 dark:text-gray-200 text-sm font-semibold mb-3 flex items-center"
+                            for="nominal">
                             <i class="fa-solid fa-coins mr-2 text-yellow-500"></i>
                             Jumlah Nominal
                         </label>
@@ -107,7 +114,8 @@
 
                     <!-- Keterangan -->
                     <div class="group">
-                        <label class="block text-gray-700 dark:text-gray-200 text-sm font-semibold mb-3 flex items-center"
+                        <label
+                            class="block text-gray-700 dark:text-gray-200 text-sm font-semibold mb-3 flex items-center"
                             for="keterangan">
                             <svg class="w-4 h-4 mr-2 text-blue-500" fill="none" stroke="currentColor"
                                 viewBox="0 0 24 24">
@@ -121,6 +129,33 @@
                         <textarea name="keterangan" id="keterangan" rows="3"
                             class="w-full py-3 px-4 bg-gray-50 dark:bg-gray-700 border-2 border-gray-200 dark:border-gray-600 rounded-xl text-gray-700 dark:text-gray-200 leading-tight focus:outline-none focus:bg-white focus:border-blue-500 transition-all duration-300 resize-none dark:placeholder:text-gray-500"
                             placeholder="Tambahkan catatan untuk transaksi ini..."></textarea>
+                    </div>
+
+                    <div class="group">
+                        <label
+                            class="block text-gray-700 dark:text-gray-200 text-sm font-semibold mb-3 flex items-center"
+                            for="images">
+                            <i class="fa-solid fa-images mr-2 text-teal-500"></i>
+                            Upload Bukti <span class="text-gray-400 ml-2"> (Bisa lebih dari satu)</span>
+                        </label>
+
+                        {{-- INI INPUT FILE-NYA --}}
+                        <input type="file" name="images[]" {{-- Nama harus 'images[]' untuk mengirim array --}}
+                            id="images" accept="image/*" multiple {{-- Atribut 'multiple' agar bisa memilih banyak file
+                            --}} class="block w-full text-sm text-slate-500 dark:text-slate-400
+                                      file:mr-4 file:py-2 file:px-4
+                                      file:rounded-full file:border-0
+                                      file:text-sm file:font-semibold
+                                      file:bg-violet-50 file:text-violet-700
+                                      hover:file:bg-violet-100"
+                            onchange="previewMultipleImages(event, 'imagePreviewContainer')">
+
+                        <p class="text-xs text-gray-500 mt-2 ml-1">Maks: 2MB per file. Format: JPG, PNG, GIF</p>
+
+                        {{-- INI CONTAINER UNTUK MENAMPILKAN PREVIEW GAMBAR YANG DIPILIH --}}
+                        <div id="imagePreviewContainer" class="mt-4 flex flex-wrap gap-4">
+                            {{-- Preview gambar akan dibuat oleh JavaScript di sini --}}
+                        </div>
                     </div>
 
                     <!-- Action Buttons -->

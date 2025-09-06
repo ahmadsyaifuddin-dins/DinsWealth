@@ -43,4 +43,10 @@ class Tabungan extends Model
     {
         return 'Rp ' . number_format($this->nominal, 0, ',', '.');
     }
+
+    // TAMBAHKAN RELASI BARU INI
+    public function images()
+    {
+        return $this->hasMany(TabunganImage::class);
+    }
 }
