@@ -30,52 +30,52 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             @include('includes.messages')
             
-            {{-- =============================================== --}}
-            {{-- AREA GRAFIK (BAGIAN BARU) --}}
-            {{-- =============================================== --}}
-            @if(count($data) > 0 && ($user->role === 'dins' || $user->role === 'viewer'))
+            {{-- AREA GRAFIK --}}
+            {{-- Cek jika $data (paginator) punya item --}}
+            @if($data->total() > 0 && ($user->role === 'dins' || $user->role === 'viewer'))
                 <div class="mb-6">
                     @include('tabungan.partials._charts')
                 </div>
             @endif
             
-            {{-- =============================================== --}}
-            {{-- KARTU TOTAL SALDO (BAGIAN BARU) --}}
-            {{-- =============================================== --}}
-            @if(count($data) > 0 && ($user->role === 'dins' || $user->role === 'viewer'))
+            {{-- KARTU TOTAL SALDO --}}
+            {{-- Cek jika $data (paginator) punya item --}}
+            @if($data->total() > 0 && ($user->role === 'dins' || $user->role === 'viewer'))
                 <div class="mb-6">
                     @include('tabungan.partials._card_savings')
                 </div>
             @endif
             
-            {{-- =============================================== --}}
-            {{-- KODE FORM FILTER DIMULAI DARI SINI --}}
-            {{-- =============================================== --}}
+            {{-- KODE FORM FILTER --}}
             <div class="mb-6">
                 @include('tabungan.partials._filters')
             </div>
             
-            {{-- =============================================== --}}
-            {{-- KODE TABLE Dins DIMULAI DARI SINI --}}
-            {{-- =============================================== --}}
+            {{-- KODE TABLE Dins --}}
             @if ($user->role === 'dins')
                 <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm dark:shadow-gray-900/50 border border-gray-200 dark:border-gray-700 transition-colors duration-200">
                     @include('tabungan.partials._dins_view')
                 </div>
 
-            {{-- =============================================== --}}
-            {{-- TAMBAHKAN MODAL KONFIRMASI HAPUS (BARU) --}}
-            {{-- =============================================== --}}    
+                {{-- LINK PAGINATION UNTUK DINS --}}
+                <div class="mt-6">
+                    {{ $data->withQueryString()->links() }}
+                </div>
+
+            {{-- MODAL KONFIRMASI HAPUS --}}
             @if($user->role === 'dins')
                 @include('tabungan.partials.modal-delete-confirm')
             @endif
 
-            {{-- =============================================== --}}
-            {{-- KODE TABLE VIEWER DIMULAI DARI SINI --}}
-            {{-- =============================================== --}}
+            {{-- KODE TABLE VIEWER --}}
             @elseif ($user->role === 'viewer')
                 <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm dark:shadow-gray-900/50 border border-gray-200 dark:border-gray-700 transition-colors duration-200">
                     @include('tabungan.partials._viewer_view')
+                </div>
+
+                {{-- LINK PAGINATION UNTUK VIEWER --}}
+                <div class="mt-6">
+                    {{ $data->withQueryString()->links() }}
                 </div>
             @endif
         </div>
@@ -90,5 +90,5 @@
     @include('tabungan.partials.modal-tabungan-edit')
     @include('tabungan.partials.modal-show')
 
-   
+    
 </x-app-layout>

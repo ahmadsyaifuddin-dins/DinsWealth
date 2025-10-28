@@ -1,7 +1,5 @@
 <script>
-    // ===============================================
     // FUNGSI-FUNGSI GLOBAL
-    // ===============================================
     function openModal() {
         document.getElementById('tabunganModal').classList.remove('hidden');
         setTimeout(() => {
@@ -19,66 +17,64 @@
         document.getElementById('imagePreviewContainer').innerHTML = ''; 
     }
 
-    // DIMODIFIKASI TOTAL: openEditModal sekarang jauh lebih kompleks untuk menangani gambar.
     function openEditModal(item) {
-    const modal = document.getElementById('editTabunganModal');
-    const form = document.getElementById('editTabunganForm');
-    
-    // 1. Set action form
-    form.action = `/tabungan/${item.id}`;
+        const modal = document.getElementById('editTabunganModal');
+        const form = document.getElementById('editTabunganForm');
+        
+        form.action = `/tabungan/${item.id}`;
 
-    // 2. Isi nilai-nilai form teks
-    document.getElementById('edit_nama').value = item.nama;
-    document.getElementById('edit_jenis').value = item.jenis;
-    document.getElementById('edit_keterangan').value = item.keterangan ?? ''; // Lebih aman jika keterangan null
-    document.getElementById('edit_nominal').value = new Intl.NumberFormat('id-ID').format(item.nominal);
+        document.getElementById('edit_nama').value = item.nama;
+        document.getElementById('edit_jenis').value = item.jenis;
+        document.getElementById('edit_keterangan').value = item.keterangan ?? '';
+        document.getElementById('edit_nominal').value = new Intl.NumberFormat('id-ID').format(item.nominal);
 
-    // 3. Ambil referensi ke semua kontainer gambar
-    const existingImagesContainer = document.getElementById('existingImagesContainer');
-    const deletedImagesContainer = document.getElementById('deletedImagesContainer');
-    const newImagePreviewContainer = document.getElementById('newImagePreviewContainer');
-    
-    // 4. Kosongkan semua kontainer untuk reset dari pembukaan sebelumnya
-    existingImagesContainer.innerHTML = '';
-    deletedImagesContainer.innerHTML = '';
-    newImagePreviewContainer.innerHTML = '';
-    document.getElementById('edit_images').value = '';
+        const dateFromServer = new Date(item.created_at);
+        dateFromServer.setMinutes(dateFromServer.getMinutes() - dateFromServer.getTimezoneOffset());
+        const localIsoDateTime = dateFromServer.toISOString().slice(0, 16);
+        document.getElementById('edit_created_at').value = localIsoDateTime;
 
-    // 5. Render gambar yang sudah ada
-    if (item.images && item.images.length > 0) {
-        item.images.forEach(image => {
-            const wrapper = document.createElement('div');
-            wrapper.className = 'relative';
-            wrapper.id = `image-wrapper-${image.id}`;
+        const existingImagesContainer = document.getElementById('existingImagesContainer');
+        const deletedImagesContainer = document.getElementById('deletedImagesContainer');
+        const newImagePreviewContainer = document.getElementById('newImagePreviewContainer');
+        
+        existingImagesContainer.innerHTML = '';
+        deletedImagesContainer.innerHTML = '';
+        newImagePreviewContainer.innerHTML = '';
+        document.getElementById('edit_images').value = '';
 
-            const img = document.createElement('img');
-            const finalImageUrl = "{{ app()->environment('local') ? '/storage/' : '/' }}" + image.path;
-            img.src = finalImageUrl;
-            img.className = "w-24 h-24 object-cover rounded-lg shadow-md";
+        if (item.images && item.images.length > 0) {
+            item.images.forEach(image => {
+                const wrapper = document.createElement('div');
+                wrapper.className = 'relative';
+                wrapper.id = `image-wrapper-${image.id}`;
 
-            const deleteBtn = document.createElement('button');
-            deleteBtn.type = 'button';
-            deleteBtn.innerHTML = '&times;';
-            deleteBtn.className = 'absolute top-0 right-0 -mt-2 -mr-2 w-6 h-6 bg-red-600 text-white rounded-full flex items-center justify-center font-bold text-lg hover:bg-red-800 transition-all';
-            
-            deleteBtn.onclick = function() {
-                document.getElementById(`image-wrapper-${image.id}`).style.display = 'none';
-                const hiddenInput = document.createElement('input');
-                hiddenInput.type = 'hidden';
-                hiddenInput.name = 'deleted_images[]';
-                hiddenInput.value = image.id;
-                deletedImagesContainer.appendChild(hiddenInput);
-            };
+                const img = document.createElement('img');
+                const finalImageUrl = "{{ app()->environment('local') ? '/storage/' : '/' }}" + image.path;
+                img.src = finalImageUrl;
+                img.className = "w-24 h-24 object-cover rounded-lg shadow-md";
 
-            wrapper.appendChild(img);
-            wrapper.appendChild(deleteBtn);
-            existingImagesContainer.appendChild(wrapper);
-        });
+                const deleteBtn = document.createElement('button');
+                deleteBtn.type = 'button';
+                deleteBtn.innerHTML = '&times;';
+                deleteBtn.className = 'absolute top-0 right-0 -mt-2 -mr-2 w-6 h-6 bg-red-600 text-white rounded-full flex items-center justify-center font-bold text-lg hover:bg-red-800 transition-all';
+                
+                deleteBtn.onclick = function() {
+                    document.getElementById(`image-wrapper-${image.id}`).style.display = 'none';
+                    const hiddenInput = document.createElement('input');
+                    hiddenInput.type = 'hidden';
+                    hiddenInput.name = 'deleted_images[]';
+                    hiddenInput.value = image.id;
+                    deletedImagesContainer.appendChild(hiddenInput);
+                };
+
+                wrapper.appendChild(img);
+                wrapper.appendChild(deleteBtn);
+                existingImagesContainer.appendChild(wrapper);
+            });
+        }
+        
+        modal.classList.remove('hidden');
     }
-    
-    // 6. Tampilkan modal
-    modal.classList.remove('hidden');
-}
 
     function closeEditModal() {
         document.getElementById('editTabunganModal').classList.add('hidden');
@@ -97,72 +93,69 @@
         window.location.href = `${exportUrl}?${params}`;
     }
 
-    // FUNGSI BARU: Untuk menampilkan preview multi-gambar.
     function previewMultipleImages(event, containerId) {
-    const container = document.getElementById(containerId);
-    container.innerHTML = ''; 
-    
-    if (event.target.files) {
-        Array.from(event.target.files).forEach(file => {
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                const img = document.createElement('img');
-                img.src = e.target.result;
-                img.alt = "Preview";
-                img.className = "w-24 h-24 object-cover rounded-lg shadow-md";
-                container.appendChild(img);
-            }
-            reader.readAsDataURL(file);
-        });
-    }
-}
-
-    // FUNGSI BARU UNTUK MEMBUKA MODAL DETAIL
-function openShowModal(item) {
-    const nominalEl = document.getElementById('showNominal');
-    const jenisEl = document.getElementById('showJenis');
-    const namaEl = document.getElementById('showNama');
-    const tanggalEl = document.getElementById('showTanggal');
-    const keteranganEl = document.getElementById('showKeterangan');
-    const imagesContainer = document.getElementById('showImagesContainer');
-
-    const isPemasukan = item.kategori_jenis?.jenis === 'Pemasukan';
-    
-    nominalEl.textContent = `${isPemasukan ? '+' : '-'}Rp${new Intl.NumberFormat('id-ID').format(item.nominal)}`;
-    nominalEl.className = `text-4xl font-bold ${isPemasukan ? 'text-green-600' : 'text-red-600'}`;
-    
-    jenisEl.textContent = item.kategori_jenis?.jenis ?? 'Data Hilang';
-    jenisEl.className = `mt-1 text-lg font-medium ${isPemasukan ? 'text-green-500' : 'text-red-500'}`;
-
-    namaEl.textContent = item.kategori_nama?.nama ?? 'Kategori Dihapus';
-    
-    tanggalEl.textContent = new Date(item.created_at).toLocaleDateString('id-ID', {
-        day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit'
-    }) + ' WITA';
-    
-    keteranganEl.innerHTML = item.keterangan ? `<p class="dark:text-white">${item.keterangan}</p>` : `<p class="text-gray-400">Tidak ada keterangan.</p>`;
-
-    imagesContainer.innerHTML = '';
-    if (item.images && item.images.length > 0) {
-        item.images.forEach(image => {
-            const finalImageUrl = "{{ app()->environment('local') ? '/storage/' : '/' }}" + image.path;
-            const imgLink = document.createElement('a');
-            imgLink.href = finalImageUrl;
-            imgLink.target = '_blank';
-            imgLink.innerHTML = `<img src="${finalImageUrl}" class="w-full h-32 object-cover rounded-lg shadow-md transition-transform hover:scale-105" alt="Bukti Transaksi">`;
-            imagesContainer.appendChild(imgLink);
-        });
-    } else {
-        imagesContainer.innerHTML = `<p class="text-gray-400 col-span-full text-center">Tidak ada bukti transaksi.</p>`;
+        const container = document.getElementById(containerId);
+        container.innerHTML = ''; 
+        
+        if (event.target.files) {
+            Array.from(event.target.files).forEach(file => {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const img = document.createElement('img');
+                    img.src = e.target.result;
+                    img.alt = "Preview";
+                    img.className = "w-24 h-24 object-cover rounded-lg shadow-md";
+                    container.appendChild(img);
+                }
+                reader.readAsDataURL(file);
+            });
+        }
     }
 
-    document.getElementById('showTabunganModal').classList.remove('hidden');
-}
+    function openShowModal(item) {
+        const nominalEl = document.getElementById('showNominal');
+        const jenisEl = document.getElementById('showJenis');
+        const namaEl = document.getElementById('showNama');
+        const tanggalEl = document.getElementById('showTanggal');
+        const keteranganEl = document.getElementById('showKeterangan');
+        const imagesContainer = document.getElementById('showImagesContainer');
 
-// FUNGSI BARU UNTUK MENUTUP MODAL DETAIL
-function closeShowModal() {
-    document.getElementById('showTabunganModal').classList.add('hidden');
-}
+        const isPemasukan = item.kategori_jenis?.jenis === 'Pemasukan';
+        
+        nominalEl.textContent = `${isPemasukan ? '+' : '-'}Rp${new Intl.NumberFormat('id-ID').format(item.nominal)}`;
+        nominalEl.className = `text-4xl font-bold ${isPemasukan ? 'text-green-600' : 'text-red-600'}`;
+        
+        jenisEl.textContent = item.kategori_jenis?.jenis ?? 'Data Hilang';
+        jenisEl.className = `mt-1 text-lg font-medium ${isPemasukan ? 'text-green-500' : 'text-red-500'}`;
+
+        namaEl.textContent = item.kategori_nama?.nama ?? 'Kategori Dihapus';
+        
+        tanggalEl.textContent = new Date(item.created_at).toLocaleDateString('id-ID', {
+            day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit'
+        }) + ' WITA';
+        
+        keteranganEl.innerHTML = item.keterangan ? `<p class="dark:text-white">${item.keterangan}</p>` : `<p class="text-gray-400">Tidak ada keterangan.</p>`;
+
+        imagesContainer.innerHTML = '';
+        if (item.images && item.images.length > 0) {
+            item.images.forEach(image => {
+                const finalImageUrl = "{{ app()->environment('local') ? '/storage/' : '/' }}" + image.path;
+                const imgLink = document.createElement('a');
+                imgLink.href = finalImageUrl;
+                imgLink.target = '_blank';
+                imgLink.innerHTML = `<img src="${finalImageUrl}" class="w-full h-32 object-cover rounded-lg shadow-md transition-transform hover:scale-105" alt="Bukti Transaksi">`;
+                imagesContainer.appendChild(imgLink);
+            });
+        } else {
+            imagesContainer.innerHTML = `<p class="text-gray-400 col-span-full text-center">Tidak ada bukti transaksi.</p>`;
+        }
+
+        document.getElementById('showTabunganModal').classList.remove('hidden');
+    }
+
+    function closeShowModal() {
+        document.getElementById('showTabunganModal').classList.add('hidden');
+    }
 
     // ===============================================
     // SCRIPT UTAMA - HANYA SATU DOMCONTENTLOADED
@@ -198,7 +191,6 @@ function closeShowModal() {
 
         // Inisialisasi Pie Chart
         const ctxPie = document.getElementById('pieChart');
-        // KODE BARU YANG LEBIH AMAN
         if (ctxPie && chartData.pie && chartData.pie.reduce((a, b) => a + Number(b), 0) > 0) {
             new Chart(ctxPie, {
                 type: 'pie',
@@ -241,14 +233,17 @@ function closeShowModal() {
             });
         }
 
-        // --- Logika Interaktif Line Chart ---
         let lineChartInstance;
         const ctxLine = document.getElementById('lineChart');
         const monthlyBtn = document.getElementById('lineChartMonthlyBtn');
         const dailyBtn = document.getElementById('lineChartDailyBtn');
-        const hourlyBtn = document.getElementById('lineChartHourlyBtn');
+        // Tombol baru
+        const weeklyBtn = document.getElementById('lineChartWeeklyBtn');
+        const yearlyBtn = document.getElementById('lineChartYearlyBtn');
 
-        if (ctxLine && monthlyBtn && dailyBtn && hourlyBtn) {
+        // Update if-check
+        if (ctxLine && monthlyBtn && dailyBtn && weeklyBtn && yearlyBtn) {
+            
             // Gambar chart pertama kali dengan data HARIAN (default)
             lineChartInstance = new Chart(ctxLine, {
                 type: 'line',
@@ -265,17 +260,21 @@ function closeShowModal() {
                 }
             });
 
-            // JavaScript untuk update line chart dengan styling button yang diperbaiki
+            // Fungsi update line chart
             function updateLineChart(mode) {
                 let newData;
                 switch (mode) {
+                    case 'weekly': // <-- Tambahan
+                        newData = chartData.line_weekly;
+                        break;
                     case 'monthly':
                         newData = chartData.line_monthly;
                         break;
-                    case 'hourly':
-                        newData = chartData.line_hourly;
+                    case 'yearly': // <-- Tambahan
+                        newData = chartData.line_yearly;
                         break;
-                    default:
+                    // Case 'hourly' dihapus
+                    default: // 'daily'
                         newData = chartData.line_daily;
                         break;
                 }
@@ -287,11 +286,13 @@ function closeShowModal() {
                 lineChartInstance.data.datasets[0].data = newData.data;
                 lineChartInstance.update();
 
-                // Handle styling button dengan dark mode
+                // Handle styling button
                 const buttons = {
-                    hourly: hourlyBtn,
                     daily: dailyBtn,
-                    monthly: monthlyBtn
+                    weekly: weeklyBtn, // <-- Tambahan
+                    monthly: monthlyBtn,
+                    yearly: yearlyBtn // <-- Tambahan
+                    // 'hourly' dihapus
                 };
 
                 for (const key in buttons) {
@@ -303,7 +304,6 @@ function closeShowModal() {
                         'flex-1 sm:flex-none px-3 py-2 text-xs sm:text-sm font-medium rounded-md transition-all duration-200';
 
                     if (isActive) {
-                        // Active state - lebih kontras dan jelas
                         btn.classList.add(
                             'bg-indigo-600',
                             'text-white',
@@ -314,7 +314,6 @@ function closeShowModal() {
                             'scale-105'
                         );
                     } else {
-                        // Inactive state
                         btn.classList.add(
                             'text-gray-600',
                             'dark:text-gray-300',
@@ -327,10 +326,12 @@ function closeShowModal() {
                 }
             }
 
-            // Event listeners
-            hourlyBtn.addEventListener('click', () => updateLineChart('hourly'));
+            // Event listeners (Update)
+            // hourlyBtn dihapus
             dailyBtn.addEventListener('click', () => updateLineChart('daily'));
+            weeklyBtn.addEventListener('click', () => updateLineChart('weekly')); // <-- Tambahan
             monthlyBtn.addEventListener('click', () => updateLineChart('monthly'));
+            yearlyBtn.addEventListener('click', () => updateLineChart('yearly')); // <-- Tambahan
         }
     });
 </script>

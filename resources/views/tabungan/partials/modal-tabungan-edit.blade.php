@@ -71,6 +71,16 @@
                     </div>
 
                     <div>
+                        <label for="edit_created_at"
+                            class="block text-sm font-medium text-gray-700 dark:text-gray-400 mb-2">
+                            Tanggal Transaksi
+                        </label>
+                        <input type="datetime-local" id="edit_created_at" name="created_at"
+                            class="w-full dark:bg-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-700 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200"
+                            required>
+                    </div>
+                    
+                    <div>
                         <label for="edit_keterangan"
                             class="block text-sm font-medium text-gray-700 dark:text-gray-400 mb-2">
                             Keterangan <span class="text-gray-400 text-xs">(Opsional)</span>
@@ -90,10 +100,7 @@
                         </div>
                     </div>
 
-
-                    {{-- ======================================================= --}}
                     {{-- 3. INPUT UNTUK MENAMBAH GAMBAR BARU --}}
-                    {{-- ======================================================= --}}
                     <div>
                         <label for="edit_images"
                             class="block text-sm font-medium text-gray-700 dark:text-gray-400 mb-2">
@@ -101,11 +108,11 @@
                         </label>
                         <input type="file" name="images[]" id="edit_images" accept="image/*" multiple
                             class="block w-full text-sm text-slate-500 dark:text-slate-400
-                                      file:mr-4 file:py-2 file:px-4
-                                      file:rounded-full file:border-0
-                                      file:text-sm file:font-semibold
-                                      file:bg-violet-50 file:text-violet-700
-                                      hover:file:bg-violet-100"
+                                       file:mr-4 file:py-2 file:px-4
+                                       file:rounded-full file:border-0
+                                       file:text-sm file:font-semibold
+                                       file:bg-violet-50 file:text-violet-700
+                                       hover:file:bg-violet-100"
                             onchange="previewMultipleImages(event, 'newImagePreviewContainer')">
 
                         {{-- Kontener untuk preview gambar yang BARU dipilih --}}
@@ -162,15 +169,33 @@
 
     #editTabunganModal .overflow-y-auto::-webkit-scrollbar-track {
         background: #f1f5f9;
-        border-radius: 3px;
+        /* (tailwindcss/colors.js) slate-100 */
     }
 
     #editTabunganModal .overflow-y-auto::-webkit-scrollbar-thumb {
         background: #cbd5e1;
+        /* (tailwindcss/colors.js) slate-300 */
         border-radius: 3px;
     }
 
     #editTabunganModal .overflow-y-auto::-webkit-scrollbar-thumb:hover {
         background: #94a3b8;
+        /* (tailwindcss/colors.js) slate-400 */
+    }
+
+    /* Dark mode scrollbar */
+    .dark #editTabunganModal .overflow-y-auto::-webkit-scrollbar-track {
+        background: #334155;
+        /* (tailwindcss/colors.js) slate-700 */
+    }
+
+    .dark #editTabunganModal .overflow-y-auto::-webkit-scrollbar-thumb {
+        background: #475569;
+        /* (tailwindcss/colors.js) slate-600 */
+    }
+
+    .dark #editTabunganModal .overflow-y-auto::-webkit-scrollbar-thumb:hover {
+        background: #64748b;
+        /* (tailwindcss/colors.js) slate-500 */
     }
 </style>

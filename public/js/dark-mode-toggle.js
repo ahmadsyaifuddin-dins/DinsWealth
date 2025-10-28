@@ -9,18 +9,21 @@ class DarkModeToggle {
     }
 
     init() {
-        // Check for saved theme preference or default to light mode
-        const currentTheme = localStorage.getItem('theme') || 'light';
-        this.setTheme(currentTheme);
+        // MODIFIKASI:
+        // Skrip inline di <head> sudah mengatur tema.
+        // Kita sekarang HANYA perlu membaca state yang ada untuk mengatur tombolnya.
+        const currentTheme = this.html.classList.contains('dark') ? 'dark' : 'light';
+        this.updateAllToggles(currentTheme);
         
-        // Add event listeners for both old and new toggles
+        // Add event listeners
         if (this.darkModeToggle) {
             this.darkModeToggle.addEventListener('click', () => this.toggleTheme());
         }
 
         if (this.themeToggle) {
             this.themeToggle.addEventListener('change', (e) => {
-                this.setTheme(e.target.checked ? 'dark' : 'light');
+                // Gunakan setManualTheme untuk menyimpan preferensi
+                this.setManualTheme(e.target.checked ? 'dark' : 'light');
             });
         }
 
@@ -29,10 +32,14 @@ class DarkModeToggle {
             this.updateAllToggles(e.detail.theme);
         });
 
-        // System preference detection
+        // Tetap jalankan watchSystemTheme untuk mendeteksi perubahan OS
         this.watchSystemTheme();
     }
 
+    /**
+     * Helper function untuk MENGAPLIKASIKAN class & dispatch event.
+     * TIDAK MENYIMPAN ke localStorage.
+     */
     setTheme(theme) {
         const isDark = theme === 'dark';
         
@@ -42,12 +49,8 @@ class DarkModeToggle {
             this.html.classList.remove('dark');
         }
         
-        // Update all toggle states
         this.updateAllToggles(theme);
         
-        localStorage.setItem('theme', theme);
-        
-        // Dispatch custom event for other components to listen
         window.dispatchEvent(new CustomEvent('themeChanged', {
             detail: { 
                 theme: theme,
@@ -55,7 +58,7 @@ class DarkModeToggle {
             }
         }));
 
-        // Add smooth transition class temporarily
+        // Transisi tetap di sini
         this.html.style.transition = 'background-color 0.3s ease, color 0.3s ease';
         setTimeout(() => {
             this.html.style.transition = '';
@@ -65,12 +68,10 @@ class DarkModeToggle {
     updateAllToggles(theme) {
         const isDark = theme === 'dark';
         
-        // Update new toggle component
         if (this.themeToggle) {
             this.themeToggle.checked = isDark;
         }
         
-        // Update any other toggle elements that might exist
         const allToggles = document.querySelectorAll('[data-theme-toggle]');
         allToggles.forEach(toggle => {
             if (toggle.type === 'checkbox') {
@@ -81,56 +82,58 @@ class DarkModeToggle {
 
     toggleTheme() {
         const isDark = this.html.classList.contains('dark');
-        this.setTheme(isDark ? 'light' : 'dark');
+        // Selalu gunakan setManualTheme saat user berinteraksi
+        this.setManualTheme(isDark ? 'light' : 'dark');
     }
 
     getCurrentTheme() {
         return this.html.classList.contains('dark') ? 'dark' : 'light';
     }
 
-    // Watch for system theme changes
     watchSystemTheme() {
         if (window.matchMedia) {
             const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
             
-            // Only apply system theme if no user preference is saved
-            if (!localStorage.getItem('theme')) {
-                this.setTheme(mediaQuery.matches ? 'dark' : 'light');
-            }
-
-            // Listen for system theme changes
+            // MODIFIKASI: Hapus setter awal. Skrip inline sudah menanganinya.
+            
+            // HANYA dengarkan perubahan
             mediaQuery.addEventListener('change', (e) => {
-                // Only auto-switch if user hasn't manually set a preference recently
-                const lastManualChange = localStorage.getItem('lastThemeChange');
-                const now = Date.now();
-                
-                if (!lastManualChange || (now - parseInt(lastManualChange)) > 300000) { // 5 minutes
+                // HANYA auto-switch jika user ada di mode "System"
+                // (yaitu tidak ada 'theme' di localStorage)
+                if (!localStorage.getItem('theme')) {
                     this.setTheme(e.matches ? 'dark' : 'light');
                 }
             });
         }
     }
 
-    // Method to manually override system theme
+    /**
+     * Fungsi utama saat USER memilih tema.
+     * Ini MENYIMPAN ke localStorage.
+     */
     setManualTheme(theme) {
-        localStorage.setItem('lastThemeChange', Date.now().toString());
+        // 1. Simpan pilihan user
+        localStorage.setItem('theme', theme);
+        localStorage.setItem('lastThemeChange', Date.now().toString()); // Sesuai logikamu
+        
+        // 2. Terapkan tema
         this.setTheme(theme);
     }
 
-    // Method to reset to system preference
     resetToSystemTheme() {
+        // 1. Hapus preferensi user
         localStorage.removeItem('theme');
         localStorage.removeItem('lastThemeChange');
         
+        // 2. Deteksi & terapkan tema sistem
         if (window.matchMedia) {
             const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
             this.setTheme(systemPrefersDark ? 'dark' : 'light');
         } else {
-            this.setTheme('light');
+            this.setTheme('light'); // Fallback
         }
     }
 
-    // Utility method to get system preference
     getSystemTheme() {
         if (window.matchMedia) {
             return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
@@ -139,38 +142,35 @@ class DarkModeToggle {
     }
 }
 
-// Initialize when DOM is loaded
+// Inisialisasi tidak berubah
 document.addEventListener('DOMContentLoaded', function() {
-    // Prevent multiple instances
     if (!window.darkModeToggle) {
         window.darkModeToggle = new DarkModeToggle();
     }
 });
 
-// Initialize immediately if DOM is already loaded
 if (document.readyState === 'loading') {
-    // DOM is still loading
+    // DOM masih loading
 } else {
-    // DOM is already loaded
+    // DOM sudah loaded
     if (!window.darkModeToggle) {
         window.darkModeToggle = new DarkModeToggle();
     }
 }
 
-// Export for module usage
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = DarkModeToggle;
 }
 
-// Global utility functions
+// Global functions (pastikan mereka memanggil setManualTheme)
 window.toggleTheme = function() {
     if (window.darkModeToggle) {
-        window.darkModeToggle.toggleTheme();
+        window.darkModeToggle.toggleTheme(); // Ini sudah benar
     }
 };
 
 window.setTheme = function(theme) {
     if (window.darkModeToggle) {
-        window.darkModeToggle.setManualTheme(theme);
+        window.darkModeToggle.setManualTheme(theme); // Pastikan panggil manual
     }
 };

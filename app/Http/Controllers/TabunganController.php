@@ -30,9 +30,7 @@ class TabunganController extends Controller
         // Ambil data yang sudah difilter
         $data = $this->getFilteredQuery($request)->get();
 
-        // ===============================================
-        // BAGIAN BARU: HITUNG TOTAL UNTUK LAPORAN
-        // ===============================================
+        // HITUNG TOTAL UNTUK LAPORAN
         $totalPemasukan = $data->where('kategoriJenis.jenis', 'Pemasukan')->sum('nominal');
         $totalPengeluaran = $data->where('kategoriJenis.jenis', 'Pengeluaran')->sum('nominal');
         $saldoAkhir = $totalPemasukan - $totalPengeluaran;
@@ -81,9 +79,7 @@ class TabunganController extends Controller
 
     public function index(Request $request)
     {
-        // =================================================================
         // 1. DATA UNTUK TABEL & TOTAL (SESUAI FILTER DARI USER)
-        // =================================================================
         $user = Auth::user();
 
         // Mulai query dasar
@@ -116,20 +112,20 @@ class TabunganController extends Controller
         }
 
         // Ambil data SETELAH semua kondisi diterapkan
-        $data = $query->latest()->get();
+        $queryForTotalsAndCharts = clone $query;
+        $allFilteredData = $queryForTotalsAndCharts->latest()->get();
 
-        // =======================================================
+        $data = $query->latest()->paginate(15);
         // PERSIAPAN DATA UNTUK GRAFIK (MENGIKUTI FILTER)
-        // =======================================================
         $chartData = [];
-        if ($data->isNotEmpty()) {
-            // 1. Data untuk Pie Chart (Pemasukan vs Pengeluaran) - DARI DATA YANG SUDAH DIFILTER
-            $totalPemasukan = $data->where('kategoriJenis.jenis', 'Pemasukan')->sum('nominal');
-            $totalPengeluaran = $data->where('kategoriJenis.jenis', 'Pengeluaran')->sum('nominal');
-            $chartData['pie'] = [$totalPemasukan, $totalPengeluaran];
+        if ($allFilteredData->isNotEmpty()) {
+            // 1. Data untuk Pie Chart (Pemasukan vs Pengeluaran)
+            $totalPemasukanPie = $allFilteredData->where('kategoriJenis.jenis', 'Pemasukan')->sum('nominal');
+            $totalPengeluaranPie = $allFilteredData->where('kategoriJenis.jenis', 'Pengeluaran')->sum('nominal');
+            $chartData['pie'] = [$totalPemasukanPie, $totalPengeluaranPie];
 
-            // 2. Data untuk Line Chart (Riwayat per bulan) - DARI DATA YANG SUDAH DIFILTER
-            $lineChartData = $data->sortBy('created_at')
+            // 2. Data untuk Line Chart (Riwayat per bulan)
+            $lineChartData = $allFilteredData->sortBy('created_at')
                 ->groupBy(function ($item) {
                     return $item->created_at->format('Y-m'); // Grup berdasarkan Tahun-Bulan
                 })
@@ -141,14 +137,13 @@ class TabunganController extends Controller
 
             $chartData['line'] = [
                 'labels' => $lineChartData->keys()->map(function ($date) {
-                    // Format label menjadi "Nama Bulan Tahun"
                     return \Carbon\Carbon::createFromFormat('Y-m', $date)->isoFormat('MMMM Y');
                 }),
                 'data' => $lineChartData->values(),
             ];
 
-            // 3. Data untuk Bar Chart (Kategori paling sering) - DARI DATA YANG SUDAH DIFILTER
-            $barChartData = $data->where('kategoriJenis.jenis', 'Pengeluaran') // Fokus pada pengeluaran
+            // 3. Data untuk Bar Chart (Kategori paling sering)
+            $barChartData = $allFilteredData->where('kategoriJenis.jenis', 'Pengeluaran') // Fokus pada pengeluaran
                 ->countBy('kategoriNama.nama')
                 ->sortDesc()
                 ->take(5); // Ambil 5 teratas
@@ -158,8 +153,8 @@ class TabunganController extends Controller
                 'data' => $barChartData->values(),
             ];
 
-            // 4. Data untuk Line Chart Bulanan - DARI DATA YANG SUDAH DIFILTER
-            $lineChartBulanan = $data->sortBy('created_at')
+            // 4. Data untuk Line Chart Bulanan
+            $lineChartBulanan = $allFilteredData->sortBy('created_at')
                 ->groupBy(function ($item) {
                     return $item->created_at->format('Y-m');
                 })
@@ -177,7 +172,7 @@ class TabunganController extends Controller
             ];
 
             // 5. Data untuk Line Chart Harian (30 hari terakhir dari data yang difilter)
-            $dataHarian = $data->filter(function ($item) {
+            $dataHarian = $allFilteredData->filter(function ($item) {
                 return $item->created_at >= now()->subDays(29)->startOfDay();
             })
                 ->sortBy('created_at')
@@ -198,7 +193,7 @@ class TabunganController extends Controller
             ];
 
             // 6. Data untuk Line Chart Per Jam (hari ini dari data yang difilter)
-            $dataJamIni = $data->filter(function ($item) {
+            $dataJamIni = $allFilteredData->filter(function ($item) {
                 return $item->created_at->isToday();
             })
                 ->sortBy('created_at')
@@ -211,28 +206,53 @@ class TabunganController extends Controller
                     return $pemasukan - $pengeluaran;
                 });
 
-            // Buat array 24 jam (0-23) dengan default 0
-            $hourlyData = array_fill(0, 24, 0);
-            foreach ($dataJamIni as $hour => $netFlow) {
-                $hourlyData[(int)$hour] = $netFlow;
-            }
+            // 6. Data untuk Line Chart Mingguan
+            $lineChartMingguan = $allFilteredData->sortBy('created_at')
+                ->groupBy(function ($item) {
+                    // Grup berdasarkan Tahun-Mingguke (misal: 2025-42)
+                    return $item->created_at->isoFormat('YYYY-WW');
+                })
+                ->map(function ($group) {
+                    $pemasukan = $group->where('kategoriJenis.jenis', 'Pemasukan')->sum('nominal');
+                    $pengeluaran = $group->where('kategoriJenis.jenis', 'Pengeluaran')->sum('nominal');
+                    return $pemasukan - $pengeluaran;
+                });
 
-            $chartData['line_hourly'] = [
-                'labels' => array_map(fn($h) => str_pad($h, 2, '0', STR_PAD_LEFT) . ':00', array_keys($hourlyData)),
-                'data' => array_values($hourlyData),
+            $chartData['line_weekly'] = [
+                'labels' => $lineChartMingguan->keys()->map(function ($date) {
+                    // Format label menjadi "Mgg [W], [YYYY]"
+                    $year = substr($date, 0, 4);
+                    $week = (int)substr($date, 5, 2);
+                    return 'Mgg ' . $week . ', ' . $year;
+                }),
+                'data' => $lineChartMingguan->values(),
+            ];
+
+            // 7. Data untuk Line Chart Tahunan
+            $lineChartTahunan = $allFilteredData->sortBy('created_at')
+                ->groupBy(function ($item) {
+                    return $item->created_at->format('Y'); // Grup berdasarkan Tahun
+                })
+                ->map(function ($group) {
+                    $pemasukan = $group->where('kategoriJenis.jenis', 'Pemasukan')->sum('nominal');
+                    $pengeluaran = $group->where('kategoriJenis.jenis', 'Pengeluaran')->sum('nominal');
+                    return $pemasukan - $pengeluaran;
+                });
+
+            $chartData['line_yearly'] = [
+                'labels' => $lineChartTahunan->keys(), // Labelnya adalah tahun (misal: "2024", "2025")
+                'data' => $lineChartTahunan->values(),
             ];
         }
 
-        // ===============================================
         // HITUNG TOTAL UNTUK DASHBOARD (DARI DATA YANG SUDAH DIFILTER)
-        // ===============================================
-        $totalPemasukan = $data->where('kategoriJenis.jenis', 'Pemasukan')->sum('nominal');
-        $totalPengeluaran = $data->where('kategoriJenis.jenis', 'Pengeluaran')->sum('nominal');
+        $totalPemasukan = $allFilteredData->where('kategoriJenis.jenis', 'Pemasukan')->sum('nominal');
+        $totalPengeluaran = $allFilteredData->where('kategoriJenis.jenis', 'Pengeluaran')->sum('nominal');
         $saldoAkhir = $totalPemasukan - $totalPengeluaran;
 
-        // =================================================================
+        $totalTransaksi = $allFilteredData->count();
+
         // AMBIL DATA UNTUK DROPDOWN & KIRIM KE VIEW
-        // =================================================================
         $namaKategori = KategoriNamaTabungan::all();
         $jenisKategori = KategoriJenisTabungan::all();
 
@@ -245,7 +265,8 @@ class TabunganController extends Controller
             'chartData',
             'totalPemasukan',
             'totalPengeluaran',
-            'saldoAkhir'
+            'saldoAkhir',
+            'totalTransaksi'
         ));
     }
 
@@ -316,6 +337,7 @@ class TabunganController extends Controller
             'nominal' => 'required|string',
             'keterangan' => 'nullable|string|max:255',
             'images' => 'nullable|array',
+            'created_at' => 'required|date',
             'images.*' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
             'deleted_images' => 'nullable|array', // Untuk menampung ID gambar yang mau dihapus
         ]);
@@ -330,6 +352,7 @@ class TabunganController extends Controller
             'jenis' => $validated['jenis'],
             'nominal' => $cleanedNominal,
             'keterangan' => $validated['keterangan'],
+            'created_at' => $validated['created_at'],
         ]);
 
         // Hapus gambar yang ditandai untuk dihapus

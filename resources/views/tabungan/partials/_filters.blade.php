@@ -1,6 +1,4 @@
-{{-- =============================================== --}}
 {{-- KODE FORM FILTER DIMULAI DARI SINI --}}
-{{-- =============================================== --}}
 <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 mb-6">
     <h3 class="text-xl font-bold text-gray-800 dark:text-gray-200 mb-4">
         <i class="fa-solid fa-filter mr-2"></i>
@@ -96,6 +94,3 @@
         </div>
     </form>
 </div>
-{{-- =============================================== --}}
-{{-- KODE FORM FILTER SELESAI --}}
-{{-- =============================================== --}}
