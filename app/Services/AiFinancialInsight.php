@@ -1,5 +1,6 @@
 <?php
 
+namespace App\Helpers;
 namespace App\Services;
 
 use App\Models\Tabungan;
@@ -16,26 +17,12 @@ class AiFinancialInsight
     public function __construct()
     {
         $this->apiKey = env('OPENAI_API_KEY');
-        $this->model = env('OPENAI_MODEL', 'gpt-3.5-turbo');
+        // Default ke Llama 3.3 jika .env tidak diatur
+        $this->model = env('OPENAI_MODEL', 'llama-3.3-70b-versatile');
     }
 
     /**
-     * 1. Cek apakah API Key Valid/Aktif sebelum melakukan heavy request
-     */
-    public function checkConnection()
-    {
-        try {
-            $response = Http::withToken($this->apiKey)
-                ->get('https://api.openai.com/v1/models');
-
-            return $response->successful();
-        } catch (\Exception $e) {
-            return false;
-        }
-    }
-
-    /**
-     * 2. Fungsi Utama: Ambil Insight
+     * Fungsi Utama: Ambil Insight
      */
     public function getInsight()
     {
@@ -47,15 +34,14 @@ class AiFinancialInsight
     }
 
     /**
-     * 3. Hitung Data Mentah (Laravel Side)
-     * Agar hemat token dan data privasi aman, kita hitung total di sini.
+     * Hitung Data Mentah (Laravel Side)
      */
     private function prepareFinancialData()
     {
         $now = Carbon::now();
-        $lastMonth = Carbon::now()->subMonth();
+        $lastMonth = $now->copy()->subMonth();
 
-        // ID Jenis: 1 = Pemasukan, 2 = Pengeluaran (Sesuai SQL Dump)
+        // ID Jenis: 1 = Pemasukan, 2 = Pengeluaran
         
         // A. Hitung Bulan Ini
         $pemasukanBulanIni = Tabungan::whereMonth('created_at', $now->month)
@@ -74,9 +60,7 @@ class AiFinancialInsight
             ->where('jenis', '2')
             ->sum('nominal');
 
-        // C. Cari Kategori Pengeluaran Terbesar Bulan Ini
-        // Note: Di tabel 'tabungans', kolom 'nama' menyimpan ID kategori (misal: '3', '2') tapi tipe datanya string.
-        // Kita perlu join atau grouping.
+        // C. Cari Kategori Pengeluaran Terbesar
         $topCategory = Tabungan::select('nama', DB::raw('sum(nominal) as total'))
             ->whereMonth('created_at', $now->month)
             ->whereYear('created_at', $now->year)
@@ -87,17 +71,21 @@ class AiFinancialInsight
 
         $namaKategoriTop = '-';
         if ($topCategory) {
-            // Ambil nama asli dari tabel kategori_nama_tabungans
             $kategoriDb = KategoriNamaTabungan::find($topCategory->nama);
             $namaKategoriTop = $kategoriDb ? $kategoriDb->nama : 'Lainnya';
         }
 
         // Hitung persentase kenaikan/penurunan
         $selisih = $pengeluaranBulanIni - $pengeluaranBulanLalu;
-        $persen = $pengeluaranBulanLalu > 0 ? round(($selisih / $pengeluaranBulanLalu) * 100) : 100;
-        $statusNaikTurun = $selisih > 0 ? "NAIK" : "TURUN";
+        // Hindari division by zero
+        if ($pengeluaranBulanLalu > 0) {
+            $persen = round(($selisih / $pengeluaranBulanLalu) * 100);
+        } else {
+            $persen = $pengeluaranBulanIni > 0 ? 100 : 0;
+        }
+        
+        $statusNaikTurun = $selisih > 0 ? "NAIK (Lebih boros)" : "TURUN (Lebih hemat)";
 
-        // Return Data Array yang bersih untuk dikirim ke AI
         return [
             'bulan_ini' => $now->translatedFormat('F Y'),
             'total_pemasukan' => $pemasukanBulanIni,
@@ -106,54 +94,58 @@ class AiFinancialInsight
             'status_pengeluaran' => $statusNaikTurun,
             'persentase_perubahan' => abs($persen) . '%',
             'kategori_boros' => $namaKategoriTop,
+            'saldo_bulan_ini' => $pemasukanBulanIni - $pengeluaranBulanIni
         ];
     }
 
     /**
-     * 4. Kirim Prompt ke AI
+     * Kirim Prompt ke AI (Groq/OpenAI)
+     * PROMPT ENGINEERED: GIRLFRIEND MODE ❤️
      */
     private function askAi($data)
     {
-        // 1. Ambil Config (Sekarang mengarah ke Groq)
-        $modelToUse = env('OPENAI_MODEL', 'llama3-8b-8192'); 
-        
-        // Default fallback URL jika di .env lupa diisi
         $baseUrl = env('OPENAI_BASE_URL', 'https://api.groq.com/openai/v1/chat/completions');
 
+        // --- PROMPT: MODE PACAR PERHATIAN ---
         $prompt = "
-        Bertindaklah sebagai penasihat keuangan pribadi yang santai namun bijak untuk seorang mahasiswa informatika.
-        Berikut adalah data keuangan saya bulan ini:
-        - Bulan: {$data['bulan_ini']}
+        Berperanlah sebagai pacar perempuannya Dins yang sangat perhatian, sayang, tapi agak cerewet kalau soal keuangan.
+        Kamu selalu ingin Dins sukses dan punya tabungan masa depan buat kalian berdua.
+        Panggilanmu ke dia: 'Sayang', 'Beb', atau 'Ayang'.
+        
+        Data Keuangan Dins Bulan Ini ({$data['bulan_ini']}):
         - Pemasukan: Rp " . number_format($data['total_pemasukan']) . "
         - Pengeluaran: Rp " . number_format($data['total_pengeluaran']) . "
-        - Perbandingan Pengeluaran vs Bulan Lalu: {$data['status_pengeluaran']} sebesar {$data['persentase_perubahan']}
-        - Kategori Paling Boros: {$data['kategori_boros']}
+        - Saldo (Cashflow): Rp " . number_format($data['saldo_bulan_ini']) . "
+        - Tren Pengeluaran vs Bulan Lalu: {$data['status_pengeluaran']} sebesar {$data['persentase_perubahan']}
+        - Kategori Paling Banyak Jajan: {$data['kategori_boros']}
 
         Tugasmu:
-        Berikan ringkasan singkat (maksimal 3-4 kalimat).
-        1. Highlight kondisi keuangan saya (apakah bahaya atau aman).
-        2. Berikan saran spesifik berdasarkan kategori boros tersebut.
-        3. Gunakan bahasa Indonesia yang luwes, memotivasi, dan tidak kaku. Panggil saya 'Bro' atau 'Dins'.
+        Berikan komentar singkat (maksimal 3-4 kalimat) selayaknya chat WA dari pacar:
+        1. Gunakan bahasa aku-kamu yang hangat, pakai emoji love/kiss di akhir. 😘
+        2. Kalau pengeluaran NAIK/BOROS: Marah manja/ngambek lucu. Ingatkan soal nabung buat halalin aku / masa depan. 💍
+        3. Kalau pengeluaran HEMAT: Puji dia setinggi langit, bilang bangga punya cowok pinter atur duit. ❤️
+        4. Kalau saldo TIPIS: Kasih semangat, tawarkan dukungan emosional (misal: 'Gapapa sayang, nanti kita cari cuan bareng ya').
+        
+        Format Jawaban (Langsung paragraf, natural seperti chat):
+        [Panggilan sayang + Reaksi emosional] [Komentar soal data] [Saran/Dukungan manis].
         ";
 
         try {
-            // 2. Request ke URL Groq
             $response = Http::timeout(30)
-                ->withToken($this->apiKey) // Ini akan pakai key 'gsk_...' dari .env
-                ->post($baseUrl, [ // Menggunakan URL Groq
-                    'model' => $modelToUse,
-                    'messages' => [
-                        ['role' => 'system', 'content' => 'You are a helpful financial assistant.'],
-                        ['role' => 'user', 'content' => $prompt],
-                    ],
-                    'temperature' => 0.7,
-                    'max_tokens' => 300,
+                ->withToken($this->apiKey)
+                ->post($baseUrl, [
+                'model' => $this->model,
+                'messages' => [
+                    ['role' => 'system', 'content' => 'Kamu adalah pacar Dins yang sangat perhatian, manja, dan peduli masa depan.'],
+                    ['role' => 'user', 'content' => $prompt],
+                ],
+                'temperature' => 0.8, // Agak kreatif biar bawelnya natural
+                'max_tokens' => 350,
             ]);
 
             if ($response->successful()) {
                 return $response->json()['choices'][0]['message']['content'];
             } else {
-                // Debug Error
                 $errorBody = $response->json();
                 $pesanError = isset($errorBody['error']['message']) 
                     ? $errorBody['error']['message'] 
