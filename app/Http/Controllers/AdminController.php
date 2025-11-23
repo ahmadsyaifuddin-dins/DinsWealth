@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\KategoriNamaTabungan;
 use App\Models\KategoriJenisTabungan;
 use App\Helpers\DashboardGreetingHelper;
+use App\Services\AiFinancialInsight;
 
 class AdminController extends Controller
 {
@@ -20,7 +21,7 @@ class AdminController extends Controller
             abort(403, 'Akses Ditolak');
         }
         
-        // Data ringkasan keuangan
+        // ... (kode query ringkasan keuangan tetap sama, tidak perlu diubah) ...
         $totalPemasukan = Tabungan::whereHas('kategoriJenis', fn($q) => $q->where('jenis', 'Pemasukan'))->sum('nominal');
         $totalPengeluaran = Tabungan::whereHas('kategoriJenis', fn($q) => $q->where('jenis', 'Pengeluaran'))->sum('nominal');
         $saldoSaatIni = $totalPemasukan - $totalPengeluaran;
@@ -37,13 +38,11 @@ class AdminController extends Controller
             
         $transaksiTerakhir = Tabungan::with(['kategoriNama', 'kategoriJenis'])->latest()->take(5)->get();
         
-        // Chart data: 7 hari terakhir
+        // Chart data
         $weeklyChartData = $this->getWeeklyChartData();
-        
-        // Chart data: 1 bulan penuh
         $monthlyChartData = $this->getMonthlyChartData();
         
-        // Generate greeting menggunakan Helper
+        // Greeting Helper Logic
         $pengeluaranHariIni = Tabungan::whereHas('kategoriJenis', fn($q) => $q->where('jenis', 'Pengeluaran'))
             ->whereDate('created_at', now()->toDateString())
             ->sum('nominal');
@@ -58,7 +57,15 @@ class AdminController extends Controller
             $saldoSaatIni
         );
         
-        // Data untuk modal
+        // --- 2. TAMBAHKAN LOGIC AI DI SINI ---
+        // Kita gunakan Cache agar tidak boros API Key setiap refresh halaman
+        // Cache akan disimpan selama 60 menit (60*60 detik)
+        $aiService = new AiFinancialInsight();
+        $aiInsight = cache()->remember('dins_finance_insight_' . Auth::id(), 60 * 60, function () use ($aiService) {
+            return $aiService->getInsight();
+        });
+        
+        // Data modal
         $namaKategori = KategoriNamaTabungan::all();
         $jenisKategori = KategoriJenisTabungan::all();
         
@@ -70,6 +77,7 @@ class AdminController extends Controller
             'monthlyChartData',
             'weeklyChartData',
             'greeting',
+            'aiInsight',
             'pengeluaranHariIni',
             'namaKategori',
             'jenisKategori'

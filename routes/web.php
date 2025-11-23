@@ -8,6 +8,7 @@ use App\Http\Controllers\KategoriNamaTabunganController;
 use App\Http\Controllers\KategoriJenisTabunganController;
 use App\Http\Controllers\PlannedTransactionController;
 use App\Http\Controllers\ViewerController;
+use Illuminate\Support\Facades\Http;
 
 // =======================
 // Public Route
@@ -48,7 +49,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/tabungan/export/excel', [TabunganController::class, 'exportExcel'])->name('tabungan.export.excel');
     Route::get('/tabungan/export/pdf', [TabunganController::class, 'exportPdf'])->name('tabungan.export.pdf');
     
-    // PENTING: Route khusus harus ditempatkan SEBELUM resource route
+    // Route khusus harus ditempatkan SEBELUM resource route
     // Route untuk fitur sampah (hanya untuk dins, tapi ditempatkan di sini untuk urutan)
     Route::middleware('role:dins')->group(function () {
         Route::get('/tabungan/trash', [TabunganController::class, 'trash'])->name('tabungan.trash');
@@ -93,3 +94,48 @@ Route::middleware(['auth', 'role:dins'])->group(function () {
 // Auth Routes
 // =======================
 require __DIR__ . '/auth.php';
+
+Route::get('/debug-openai-models', function () {
+    $apiKey = env('OPENAI_API_KEY');
+    
+    if (empty($apiKey)) {
+        return response()->json(['error' => 'API Key kosong di .env'], 500);
+    }
+
+    try {
+        // 1. Cek Koneksi ke Endpoint Models
+        $response = Http::withToken($apiKey)->get('https://api.openai.com/v1/models');
+
+        // 2. Jika Gagal, tampilkan error code-nya
+        if ($response->failed()) {
+            return response()->json([
+                'status' => 'GAGAL',
+                'http_code' => $response->status(),
+                'error_message' => $response->json()
+            ], $response->status());
+        }
+
+        // 3. Jika Sukses, ambil list ID modelnya saja biar mudah dibaca
+        $allModels = $response->json()['data'];
+        
+        // Kita filter cari model yang mengandung 'gpt' saja biar gak penuh
+        $gptModels = collect($allModels)
+            ->pluck('id')
+            ->filter(function ($modelId) {
+                return str_contains($modelId, 'gpt');
+            })
+            ->values();
+
+        return response()->json([
+            'status' => 'BERHASIL',
+            'message' => 'API Key Valid & Koneksi Oke',
+            'rekomendasi_model_untuk_env' => $gptModels
+        ]);
+
+    } catch (\Exception $e) {
+        return response()->json([
+            'status' => 'EXCEPTION',
+            'message' => $e->getMessage()
+        ], 500);
+    }
+});

@@ -7,193 +7,170 @@ use Illuminate\Support\Carbon;
 class DashboardGreetingHelper
 {
     /**
-     * Generate greeting message berdasarkan pengeluaran harian
+     * Generate greeting message lengkap
      */
     public static function generateDailyGreeting($pengeluaranHariIni, $rataRataHarian, $saldoSaatIni)
     {
+        // 1. Ambil Salam Waktu (Pagi/Siang/Sore/Malam)
         $timeGreeting = self::getTimeGreeting();
+
+        // 2. Analisa Kebiasaan Belanja
         $spendingAnalysis = self::analyzeSpending($pengeluaranHariIni, $rataRataHarian, $saldoSaatIni);
-        
+
+        // 3. Hitung Persentase Realistis
+        $persentase = 0;
+        if ($rataRataHarian > 0) {
+            $persentase = round(($pengeluaranHariIni / $rataRataHarian) * 100, 0);
+        } elseif ($pengeluaranHariIni > 0) {
+            $persentase = 100;
+        }
+
         return array_merge($timeGreeting, $spendingAnalysis, [
             'pengeluaran_hari_ini' => $pengeluaranHariIni,
             'rata_rata' => $rataRataHarian,
             'tanggal' => now()->locale('id')->isoFormat('dddd, D MMMM Y'),
-            'persentase_vs_rata' => $rataRataHarian > 0 ? round(($pengeluaranHariIni / $rataRataHarian) * 100, 1) : 0
+            'persentase_vs_rata' => $persentase
         ]);
     }
-    
+
     /**
-     * Dapatkan greeting berdasarkan waktu
+     * Logika Salam Waktu
      */
     private static function getTimeGreeting()
     {
-        $waktu = now()->hour;
-        
-        if ($waktu >= 5 && $waktu < 11) {
-            return [
-                'waktu' => 'Pagi',
-                'icon_waktu' => 'fa-sun',
-                'salam' => 'Selamat Pagi'
-            ];
-        } elseif ($waktu >= 11 && $waktu < 15) {
-            return [
-                'waktu' => 'Siang',
-                'icon_waktu' => 'fa-sun',
-                'salam' => 'Selamat Siang'
-            ];
-        } elseif ($waktu >= 15 && $waktu < 18) {
-            return [
-                'waktu' => 'Sore',
-                'icon_waktu' => 'fa-cloud-sun',
-                'salam' => 'Selamat Sore'
-            ];
+        $jam = now()->hour;
+
+        if ($jam >= 3 && $jam < 11) {
+            return ['waktu' => 'Pagi', 'icon_waktu' => 'fa-cloud-sun', 'salam' => 'Selamat Pagi'];
+        } elseif ($jam >= 11 && $jam < 15) {
+            return ['waktu' => 'Siang', 'icon_waktu' => 'fa-sun', 'salam' => 'Selamat Siang'];
+        } elseif ($jam >= 15 && $jam < 18) {
+            return ['waktu' => 'Sore', 'icon_waktu' => 'fa-cloud-sun', 'salam' => 'Selamat Sore'];
         } else {
-            return [
-                'waktu' => 'Malam',
-                'icon_waktu' => 'fa-moon',
-                'salam' => 'Selamat Malam'
-            ];
+            return ['waktu' => 'Malam', 'icon_waktu' => 'fa-moon', 'salam' => 'Selamat Malam'];
         }
     }
-    
+
     /**
-     * Analisis pengeluaran dan generate pesan
+     * Core Logic: Analisis Pengeluaran
+     * REVISI WARNA: Menggunakan style Glassmorphism (Teks Putih) agar kontras di semua background.
      */
-    private static function analyzeSpending($pengeluaranHariIni, $rataRataHarian, $saldoSaatIni)
+    private static function analyzeSpending($current, $average, $balance)
     {
-        // Kondisi: Zero Spending
-        if ($pengeluaranHariIni == 0) {
+        // KONDISI 1: Belum ada pengeluaran (Rp 0)
+        if ($current == 0) {
             return [
                 'tipe' => 'excellent',
                 'icon' => 'fa-star',
-                'color' => 'from-green-500 to-emerald-600',
-                'gradient_text' => 'from-green-600 to-emerald-700',
-                'status' => 'Zero Spending',
-                'badge_color' => 'bg-green-500/20 text-green-100 border-green-400/30',
+                'color' => 'from-emerald-500 to-teal-600',
+                // Ubah ke Putih Transparan (Glass Effect)
+                'badge_color' => 'bg-white/20 text-white border-white/30 backdrop-blur-md',
                 'badge_icon' => 'fa-solid fa-star',
-                'icon_badge_color' => 'text-green-500',
-                'badge_text' => 'Excellent Control',
+                'icon_badge_color' => 'text-white', // Icon jadi putih
+                'badge_text' => 'Zero Spending',
                 'pesan' => self::getRandomMessage([
-                    "Luar biasa! Hari ini kamu belum mengeluarkan uang sama sekali. Pertahankan kebiasaan hemat ini! 💚",
-                    "Hebat! Zero spending hari ini. Tabunganmu pasti berterima kasih! ⭐",
-                    "Amazing! Kamu berhasil tidak mengeluarkan uang hari ini. Keep it up! 🌟"
+                    "Hari ini dompetmu aman terkendali. Belum ada pengeluaran sama sekali! 🛡️",
+                    "Mode hemat aktif! Rp 0 keluar hari ini. Pertahankan! 💚",
+                    "Start yang bagus, belum ada uang keluar hari ini. Keep it up! ✨"
                 ])
             ];
         }
-        
-        // Kondisi: Very Low Spending (≤ 50% dari rata-rata)
-        if ($pengeluaranHariIni <= $rataRataHarian * 0.5) {
+
+        // KONDISI KHUSUS: Building Data (Masalah yang kamu laporin)
+        if ($average < 5000) {
+            return [
+                'tipe' => 'neutral',
+                'icon' => 'fa-info-circle',
+                'color' => 'from-blue-500 to-indigo-600',
+                // FIX: Teks sekarang putih, background transparan. Pasti kelihatan.
+                'badge_color' => 'bg-white/20 text-white border-white/30 backdrop-blur-md',
+                'badge_icon' => 'fa-solid fa-chart-bar',
+                'icon_badge_color' => 'text-white',
+                'badge_text' => 'Building Data',
+                'pesan' => "Sistem sedang mempelajari pola keuanganmu. Terus catat transaksimu ya! 📊"
+            ];
+        }
+
+        $ratio = $current / $average;
+
+        // KONDISI 2: Sangat Hemat
+        if ($ratio <= 0.6) {
             return [
                 'tipe' => 'great',
                 'icon' => 'fa-thumbs-up',
-                'color' => 'from-blue-500 to-cyan-600',
-                'gradient_text' => 'from-blue-600 to-cyan-700',
-                'status' => 'Low Spending',
-                'badge_color' => 'bg-blue-500/20 text-blue-100 border-blue-400/30',
+                'color' => 'from-cyan-500 to-blue-600',
+                'badge_color' => 'bg-white/20 text-white border-white/30 backdrop-blur-md',
                 'badge_icon' => 'fa-solid fa-thumbs-up',
                 'icon_badge_color' => 'text-white',
-                'badge_text' => 'Great Management',
+                'badge_text' => 'Sangat Hemat',
                 'pesan' => self::getRandomMessage([
-                    "Bagus! Pengeluaran hari ini jauh di bawah rata-rata. Kamu hebat dalam mengatur keuangan! 👍",
-                    "Keren! Spending hari ini sangat terkontrol. Financial discipline yang patut dicontoh! 💙",
-                    "Well done! Pengeluaran minimal hari ini. Tabungan goals semakin dekat! 🎯"
+                    "Pengeluaranmu jauh di bawah rata-rata harian. Efisiensi tingkat tinggi! 📉",
+                    "Keren! Hari ini kamu sangat irit. Tabungan aman sentosa. 👍",
+                    "Good job! Spending hari ini sangat minimalis. 💙"
                 ])
             ];
         }
-        
-        // Kondisi: Normal Spending (≤ 100% dari rata-rata)
-        if ($pengeluaranHariIni <= $rataRataHarian) {
+
+        // KONDISI 3: Normal
+        if ($ratio <= 1.15) {
             return [
                 'tipe' => 'good',
                 'icon' => 'fa-check-circle',
-                'color' => 'from-indigo-500 to-purple-600',
-                'gradient_text' => 'from-indigo-600 to-purple-700',
-                'status' => 'Normal Spending',
-                'badge_color' => 'bg-purple-500/20 text-purple-100 border-purple-400/30',
+                'color' => 'from-indigo-500 to-violet-600',
+                'badge_color' => 'bg-white/20 text-white border-white/30 backdrop-blur-md',
                 'badge_icon' => 'fa-solid fa-check-circle',
                 'icon_badge_color' => 'text-white',
-                'badge_text' => 'Good Balance',
+                'badge_text' => 'Terkendali',
                 'pesan' => self::getRandomMessage([
-                    "Good job! Pengeluaran masih dalam batas normal. Keep spending wisely! ✅",
-                    "Nice! Kamu berhasil menjaga pengeluaran dalam rata-rata harian. Solid! 💜",
-                    "Steady! Pengeluaran terkendali hari ini. Konsistensi adalah kunci! 🔑"
+                    "Pengeluaranmu masih dalam batas wajar rata-rata harian. Lanjutkan! ✅",
+                    "Semua terkendali. Pola belanja hari ini terlihat normal & sehat. 👌",
+                    "Balance yang bagus. Tidak terlalu irit, tapi tidak boros juga. 💜"
                 ])
             ];
         }
-        
-        // Kondisi: High Spending (≤ 150% dari rata-rata)
-        if ($pengeluaranHariIni <= $rataRataHarian * 1.5) {
+
+        // KONDISI 4: Warning
+        if ($ratio <= 1.6) {
             return [
                 'tipe' => 'warning',
-                'icon' => 'fa-exclamation-triangle',
-                'color' => 'from-yellow-500 to-orange-500',
-                'gradient_text' => 'from-yellow-600 to-orange-600',
-                'status' => 'Above Average',
-                'badge_color' => 'bg-yellow-500/20 text-yellow-100 border-yellow-400/30',
+                'icon' => 'fa-exclamation-circle',
+                'color' => 'from-amber-500 to-orange-600',
+                'badge_color' => 'bg-white/20 text-white border-white/30 backdrop-blur-md',
                 'badge_icon' => 'fa-solid fa-exclamation-triangle',
                 'icon_badge_color' => 'text-white',
-                'badge_text' => 'Watch Spending',
+                'badge_text' => 'Sedikit Boros',
                 'pesan' => self::getRandomMessage([
-                    "Hmm, pengeluaran hari ini agak tinggi. Coba review lagi ya, masih ada yang bisa dihemat? 🤔",
-                    "Spending alert! Hari ini agak boros. Tomorrow let's be more mindful! ⚠️",
-                    "Pengeluaran di atas rata-rata nih. Yuk, evaluasi dan planning yang lebih baik! 📋"
+                    "Sedikit melebihi rata-rata biasanya. Coba rem dikit untuk besok ya! ⚠️",
+                    "Pengeluaran hari ini agak tinggi dari biasanya. Pastikan itu kebutuhan penting. 🤔",
+                    "Warning ringan: Spending sudah di atas rata-rata harianmu. 📉"
                 ])
             ];
         }
-        
-        // Kondisi: Very High Spending (> 150% dari rata-rata)
-        $isLowBalance = $saldoSaatIni < $pengeluaranHariIni * 10;
-        
+
+        // KONDISI 5: Bahaya
+        $isSafeBalance = $balance > ($current * 20);
+
         return [
-            'tipe' => 'alert',
+            'tipe' => 'danger',
             'icon' => 'fa-fire',
-            'color' => 'from-red-500 to-pink-600',
-            'gradient_text' => 'from-red-600 to-pink-700',
-            'status' => $isLowBalance ? 'Critical Alert' : 'High Spending',
-            'badge_color' => 'bg-red-500/20 text-red-100 border-red-400/30',
-            'badge_icon' => 'fa-solid fa-fire',
+            'color' => 'from-rose-500 to-red-600',
+            'badge_color' => 'bg-white/20 text-white border-white/30 backdrop-blur-md',
+            'badge_icon' => 'fa-solid fa-fire-flame-curved',
             'icon_badge_color' => 'text-white',
-            'badge_text' => 'High Alert',
-            'pesan' => self::getRandomMessage($isLowBalance ? [
-                "Whoa! Pengeluaran hari ini sangat tinggi dan saldo mulai tipis. Time to budget more carefully! 🚨",
-                "Red alert! Spending tinggi + saldo terbatas. Saatnya super hemat mode ON! 🔥",
-                "Critical! Pengeluaran besar hari ini. Please consider your financial limits! ⛔"
-            ] : [
-                "Wah, pengeluaran hari ini lumayan besar! Pastikan semuanya untuk kebutuhan penting ya! 🔥",
-                "Big spending day! Semoga semuanya worth it. Tomorrow let's be more conservative! 💸",
-                "Pengeluaran tinggi detected! Review dan pastikan semuanya necessary spending! 📊"
-            ])
+            'badge_text' => 'High Spending',
+            'pesan' => $isSafeBalance 
+                ? "Pengeluaran hari ini melonjak tinggi! Untung saldomu masih aman, tapi tetap hati-hati. 💸"
+                : "Alert! Pengeluaran hari ini sangat besar & tidak biasa. Segera evaluasi! 🚨"
         ];
     }
-    
-    /**
-     * Pilih pesan random dari array
-     */
+
+    public static function formatRupiah($angka)
+    {
+        return 'Rp' . number_format($angka, 0, ',', '.');
+    }
+
     private static function getRandomMessage(array $messages)
     {
         return $messages[array_rand($messages)];
-    }
-    
-    /**
-     * Format mata uang Indonesia
-     */
-    public static function formatRupiah($amount)
-    {
-        return 'Rp' . number_format($amount, 0, ',', '.');
-    }
-    
-    /**
-     * Get spending comparison text
-     */
-    public static function getSpendingComparison($current, $average)
-    {
-        if ($average == 0) return 'Tidak ada data pembanding';
-        
-        $percentage = ($current / $average) * 100;
-        
-        if ($percentage <= 50) return "Hemat " . round(100 - $percentage, 1) . "% dari rata-rata";
-        if ($percentage <= 100) return "Normal, " . round($percentage, 1) . "% dari rata-rata";
-        
-        return "Lebih tinggi " . round($percentage - 100, 1) . "% dari rata-rata";
     }
 }
