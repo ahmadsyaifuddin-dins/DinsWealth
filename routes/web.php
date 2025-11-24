@@ -7,6 +7,7 @@ use App\Http\Controllers\TabunganController;
 use App\Http\Controllers\KategoriNamaTabunganController;
 use App\Http\Controllers\KategoriJenisTabunganController;
 use App\Http\Controllers\PlannedTransactionController;
+use App\Http\Controllers\QuickCaptureController;
 use App\Http\Controllers\ViewerController;
 use Illuminate\Support\Facades\Http;
 
@@ -44,6 +45,8 @@ Route::middleware('auth')->group(function () {
 Route::middleware(['auth'])->group(function () {
     // Route tabungan index untuk semua role
     Route::get('/tabungan', [TabunganController::class, 'index'])->name('tabungan.index');
+
+    Route::post('/quick-capture', [QuickCaptureController::class, 'store'])->name('quick-capture.store');
     
     // Export routes
     Route::get('/tabungan/export/excel', [TabunganController::class, 'exportExcel'])->name('tabungan.export.excel');

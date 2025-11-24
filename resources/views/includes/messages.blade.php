@@ -1,306 +1,157 @@
-<!-- Success Message -->
-@if (session('success'))
-<div class="mb-6 relative overflow-hidden">
-    <div class="success-message bg-gradient-to-r from-green-50 dark:from-green-900 to-emerald-50 dark:to-emerald-900 border-l-4 border-green-500 dark:border-green-500 rounded-xl p-4 shadow-lg transform transition-all duration-500 hover:shadow-xl">
-        <div class="flex items-start">
-            <div class="flex-shrink-0">
-                <div class="w-10 h-10 bg-green-500 rounded-full flex items-center justify-center animate-pulse">
-                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                    </svg>
-                </div>
+<!-- GLOBAL FLASH MESSAGES CONTAINER -->
+<div class="space-y-4 mb-6">
+
+    <!-- 1. SUCCESS MESSAGE -->
+    @if (session('success'))
+        <div x-data="{ show: true }" x-show="show" x-init="setTimeout(() => show = false, 5000)"
+            x-transition:enter="transform ease-out duration-300 transition"
+            x-transition:enter-start="translate-y-2 opacity-0 sm:translate-y-0 sm:translate-x-2"
+            x-transition:enter-end="translate-y-0 opacity-100 sm:translate-x-0"
+            x-transition:leave="transition ease-in duration-100" x-transition:leave-start="opacity-100"
+            x-transition:leave-end="opacity-0" class="relative overflow-hidden rounded-2xl shadow-lg group">
+
+            <!-- Background & Border -->
+            <div
+                class="absolute inset-0 bg-gradient-to-r from-emerald-50 to-teal-50 dark:from-emerald-900/30 dark:to-teal-900/30 border-l-4 border-emerald-500 dark:border-emerald-400 backdrop-blur-sm">
             </div>
-            <div class="ml-4 flex-1">
-                <div class="flex justify-between items-start">
-                    <div>
-                        <h4 class="text-green-800 font-bold text-lg">Berhasil!</h4>
-                        <p class="text-green-700 mt-1">{{ session('success') }}</p>
+
+            <div class="relative p-4 flex items-start">
+                <div class="flex-shrink-0">
+                    <div
+                        class="w-10 h-10 bg-emerald-100 dark:bg-emerald-500/20 rounded-full flex items-center justify-center">
+                        <i class="fas fa-check text-emerald-600 dark:text-emerald-400 text-lg"></i>
                     </div>
-                    <button onclick="closeMessage(this)" class="text-green-500 hover:text-green-700 ml-4 p-1 rounded-full hover:bg-green-100 transition-colors duration-200">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                        </svg>
-                    </button>
                 </div>
+                <div class="ml-4 flex-1">
+                    <h3 class="text-sm font-bold text-emerald-800 dark:text-emerald-300">Berhasil!</h3>
+                    <p class="text-sm text-emerald-700 dark:text-emerald-200 mt-1">{{ session('success') }}</p>
+                </div>
+                <button @click="show = false"
+                    class="ml-4 text-emerald-400 hover:text-emerald-600 dark:hover:text-emerald-300 transition-colors">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <!-- Progress Bar Animation (Visual Timer) -->
+            <div class="absolute bottom-0 left-0 h-1 bg-emerald-500/30 w-full">
+                <div class="h-full bg-emerald-500 animate-progress origin-left"></div>
             </div>
         </div>
-        <!-- Decorative elements -->
-        <div class="absolute top-0 right-0 w-20 h-20 bg-green-200 bg-opacity-20 rounded-full -mr-10 -mt-10"></div>
-        <div class="absolute bottom-0 left-0 w-16 h-16 bg-green-300 bg-opacity-10 rounded-full -ml-8 -mb-8"></div>
-    </div>
-</div>
-@endif
+    @endif
 
-<!-- Error Messages -->
-@if ($errors->any())
-<div class="mb-6 relative overflow-hidden">
-    <div class="error-message bg-gradient-to-r from-red-50 dark:from-red-900 to-pink-50 dark:to-pink-900 border-l-4 border-red-500 dark:border-red-500 rounded-xl p-4 shadow-lg transform transition-all duration-500 hover:shadow-xl">
-        <div class="flex items-start">
-            <div class="flex-shrink-0">
-                <div class="w-10 h-10 bg-red-500 rounded-full flex items-center justify-center animate-bounce">
-                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                    </svg>
-                </div>
+    <!-- 2. ERROR MESSAGE (Global) -->
+    @if ($errors->any())
+        <div x-data="{ show: true }" x-show="show" x-transition:enter="transform ease-out duration-300 transition"
+            x-transition:enter-start="translate-y-2 opacity-0" x-transition:enter-end="translate-y-0 opacity-100"
+            class="relative overflow-hidden rounded-2xl shadow-lg bg-white dark:bg-gray-800 border border-red-100 dark:border-red-900/50">
+
+            <div
+                class="absolute inset-0 bg-gradient-to-r from-red-50 to-pink-50 dark:from-red-900/20 dark:to-pink-900/20 border-l-4 border-red-500 dark:border-red-500 backdrop-blur-sm">
             </div>
-            <div class="ml-4 flex-1">
-                <div class="flex justify-between items-start">
-                    <div class="flex-1">
-                        <h4 class="text-red-800 font-bold text-lg">Oops! Ada kesalahan</h4>
-                        <div class="mt-2 space-y-1">
-                            @foreach ($errors->all() as $error)
-                            <div class="flex items-center text-red-700">
-                                <svg class="w-4 h-4 mr-2 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                                </svg>
-                                <span>{{ $error }}</span>
-                            </div>
-                            @endforeach
-                        </div>
+
+            <div class="relative p-4 flex items-start">
+                <div class="flex-shrink-0">
+                    <div
+                        class="w-10 h-10 bg-red-100 dark:bg-red-500/20 rounded-full flex items-center justify-center animate-bounce-slow">
+                        <i class="fas fa-exclamation-triangle text-red-600 dark:text-red-400 text-lg"></i>
                     </div>
-                    <button onclick="closeMessage(this)" class="text-red-500 hover:text-red-700 ml-4 p-1 rounded-full hover:bg-red-100 transition-colors duration-200">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                        </svg>
-                    </button>
                 </div>
-            </div>
-        </div>
-        <!-- Decorative elements -->
-        <div class="absolute top-0 right-0 w-20 h-20 bg-red-200 bg-opacity-20 rounded-full -mr-10 -mt-10"></div>
-        <div class="absolute bottom-0 left-0 w-16 h-16 bg-red-300 bg-opacity-10 rounded-full -ml-8 -mb-8"></div>
-    </div>
-</div>
-@endif
-
-<!-- Individual Field Errors (Alternative) -->
-@error('nama')
-<div class="mb-4 relative overflow-hidden">
-    <div class="field-error bg-gradient-to-r from-red-50 dark:from-red-900 to-red-100 dark:to-red-900 border border-red-200 dark:border-red-900 rounded-lg p-3 shadow-sm">
-        <div class="flex items-center">
-            <div class="w-8 h-8 bg-red-100 rounded-full flex items-center justify-center mr-3">
-                <svg class="w-4 h-4 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
-                </svg>
-            </div>
-            <div class="flex-1">
-                <p class="text-red-800 font-medium">{{ $message }}</p>
-            </div>
-            <button onclick="closeMessage(this)" class="text-red-400 hover:text-red-600 p-1">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                </svg>
-            </button>
-        </div>
-    </div>
-</div>
-@enderror
-
-@error('jenis')
-<div class="mb-4 relative overflow-hidden">
-    <div class="field-error bg-gradient-to-r from-red-50 dark:from-red-900 to-red-100 dark:to-red-900 border border-red-200 dark:border-red-900 rounded-lg p-3 shadow-sm">
-        <div class="flex items-center">
-            <div class="w-8 h-8 bg-red-100 rounded-full flex items-center justify-center mr-3">
-                <svg class="w-4 h-4 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
-                </svg>
-            </div>
-            <div class="flex-1">
-                <p class="text-red-800 font-medium">{{ $message }}</p>
-            </div>
-            <button onclick="closeMessage(this)" class="text-red-400 hover:text-red-600 p-1">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                </svg>
-            </button>
-        </div>
-    </div>
-</div>
-@enderror
-
-@error('nominal')
-<div class="mb-4 relative overflow-hidden">
-    <div class="field-error bg-gradient-to-r from-red-50 dark:from-red-900 to-red-100 dark:to-red-900 border border-red-200 dark:border-red-900 rounded-lg p-3 shadow-sm">
-        <div class="flex items-center">
-            <div class="w-8 h-8 bg-red-100 rounded-full flex items-center justify-center mr-3">
-                <svg class="w-4 h-4 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
-                </svg>
-            </div>
-            <div class="flex-1">
-                <p class="text-red-800 font-medium">{{ $message }}</p>
-            </div>
-            <button onclick="closeMessage(this)" class="text-red-400 hover:text-red-600 p-1">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                </svg>
-            </button>
-        </div>
-    </div>
-</div>
-@enderror
-
-<!-- Info Message (Bonus) -->
-@if (session('info'))
-<div class="mb-6 relative overflow-hidden">
-    <div class="info-message bg-gradient-to-r from-blue-50 dark:from-blue-900 to-indigo-50 dark:to-indigo-900 border-l-4 border-blue-500 dark:border-blue-500 rounded-xl p-4 shadow-lg transform transition-all duration-500 hover:shadow-xl">
-        <div class="flex items-start">
-            <div class="flex-shrink-0">
-                <div class="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center animate-pulse">
-                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                    </svg>
+                <div class="ml-4 flex-1">
+                    <h3 class="text-sm font-bold text-red-800 dark:text-red-300">Oops! Ada kesalahan</h3>
+                    <ul class="mt-2 text-sm text-red-700 dark:text-red-200 list-disc list-inside space-y-1">
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
                 </div>
+                <button @click="show = false"
+                    class="ml-4 text-red-400 hover:text-red-600 dark:hover:text-red-300 transition-colors">
+                    <i class="fas fa-times"></i>
+                </button>
             </div>
-            <div class="ml-4 flex-1">
-                <div class="flex justify-between items-start">
-                    <div>
-                        <h4 class="text-blue-800 font-bold text-lg">Informasi</h4>
-                        <p class="text-blue-700 mt-1">{{ session('info') }}</p>
+        </div>
+    @endif
+
+    <!-- 3. WARNING / INFO MESSAGE -->
+    @if (session('warning') || session('info'))
+        @php
+            $type = session('warning') ? 'warning' : 'info';
+            $colors =
+                $type == 'warning'
+                    ? 'from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20 border-amber-500 text-amber-800 dark:text-amber-300'
+                    : 'from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 border-blue-500 text-blue-800 dark:text-blue-300';
+            $icon = $type == 'warning' ? 'fa-bell' : 'fa-info';
+            $iconColor =
+                $type == 'warning'
+                    ? 'text-amber-600 dark:text-amber-400 bg-amber-100 dark:bg-amber-500/20'
+                    : 'text-blue-600 dark:text-blue-400 bg-blue-100 dark:bg-blue-500/20';
+            $message = session('warning') ?? session('info');
+            $title = $type == 'warning' ? 'Perhatian' : 'Informasi';
+        @endphp
+
+        <div x-data="{ show: true }" x-show="show" class="relative overflow-hidden rounded-2xl shadow-lg">
+            <div class="absolute inset-0 bg-gradient-to-r {{ $colors }} border-l-4 backdrop-blur-sm"></div>
+            <div class="relative p-4 flex items-start">
+                <div class="flex-shrink-0">
+                    <div class="w-10 h-10 {{ $iconColor }} rounded-full flex items-center justify-center">
+                        <i class="fas {{ $icon }} text-lg"></i>
                     </div>
-                    <button onclick="closeMessage(this)" class="text-blue-500 hover:text-blue-700 ml-4 p-1 rounded-full hover:bg-blue-100 transition-colors duration-200">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                        </svg>
-                    </button>
                 </div>
+                <div class="ml-4 flex-1">
+                    <h3 class="text-sm font-bold {{ explode(' ', $colors)[4] }}">{{ $title }}</h3>
+                    <p class="text-sm mt-1 opacity-90 text-gray-700 dark:text-gray-200">{{ $message }}</p>
+                </div>
+                <button @click="show = false" class="ml-4 opacity-50 hover:opacity-100 transition-opacity">
+                    <i class="fas fa-times"></i>
+                </button>
             </div>
         </div>
-        <!-- Decorative elements -->
-        <div class="absolute top-0 right-0 w-20 h-20 bg-blue-200 bg-opacity-20 rounded-full -mr-10 -mt-10"></div>
-        <div class="absolute bottom-0 left-0 w-16 h-16 bg-blue-300 bg-opacity-10 rounded-full -ml-8 -mb-8"></div>
-    </div>
-</div>
-@endif
+    @endif
 
-<!-- Warning Message (Bonus) -->
-@if (session('warning'))
-<div class="mb-6 relative overflow-hidden">
-    <div class="warning-message bg-gradient-to-r from-yellow-50 dark:from-yellow-900 to-orange-50 dark:to-orange-900 border-l-4 border-yellow-500 dark:border-yellow-500 rounded-xl p-4 shadow-lg transform transition-all duration-500 hover:shadow-xl">
-        <div class="flex items-start">
-            <div class="flex-shrink-0">
-                <div class="w-10 h-10 bg-yellow-500 rounded-full flex items-center justify-center animate-pulse">
-                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
-                    </svg>
-                </div>
+    @if (session('error'))
+        <div x-data="{ show: true }" x-show="show" class="relative overflow-hidden rounded-2xl shadow-lg">
+            <!-- Background Merah Gelap -->
+            <div
+                class="absolute inset-0 bg-gradient-to-r from-red-50 to-rose-50 dark:from-red-900/20 dark:to-rose-900/20 border-l-4 border-red-500 dark:border-red-500 backdrop-blur-sm">
             </div>
-            <div class="ml-4 flex-1">
-                <div class="flex justify-between items-start">
-                    <div>
-                        <h4 class="text-yellow-800 font-bold text-lg">Peringatan!</h4>
-                        <p class="text-yellow-700 mt-1">{{ session('warning') }}</p>
+
+            <div class="relative p-4 flex items-start">
+                <div class="flex-shrink-0">
+                    <div
+                        class="w-10 h-10 bg-red-100 dark:bg-red-500/20 rounded-full flex items-center justify-center animate-bounce-slow">
+                        <i class="fas fa-times-circle text-red-600 dark:text-red-400 text-lg"></i>
                     </div>
-                    <button onclick="closeMessage(this)" class="text-yellow-500 hover:text-yellow-700 ml-4 p-1 rounded-full hover:bg-yellow-100 transition-colors duration-200">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                        </svg>
-                    </button>
                 </div>
+                <div class="ml-4 flex-1">
+                    <h3 class="text-sm font-bold text-red-800 dark:text-red-300">Gagal Memproses</h3>
+                    <p class="text-sm mt-1 opacity-90 text-red-700 dark:text-red-200">{{ session('error') }}</p>
+                </div>
+                <button @click="show = false"
+                    class="ml-4 text-red-400 hover:text-red-600 dark:hover:text-red-300 transition-colors">
+                    <i class="fas fa-times"></i>
+                </button>
             </div>
         </div>
-        <!-- Decorative elements -->
-        <div class="absolute top-0 right-0 w-20 h-20 bg-yellow-200 bg-opacity-20 rounded-full -mr-10 -mt-10"></div>
-        <div class="absolute bottom-0 left-0 w-16 h-16 bg-yellow-300 bg-opacity-10 rounded-full -ml-8 -mb-8"></div>
-    </div>
+    @endif
 </div>
-@endif
 
+<!-- CSS Animation for Progress Bar -->
 <style>
-    /* Message Animations */
-    .success-message, .error-message, .info-message, .warning-message, .field-error {
-        animation: slideInDown 0.5s ease-out;
-    }
-
-    @keyframes slideInDown {
+    @keyframes progress {
         from {
-            opacity: 0;
-            transform: translateY(-20px);
+            transform: scaleX(1);
         }
+
         to {
-            opacity: 1;
-            transform: translateY(0);
+            transform: scaleX(0);
         }
     }
 
-    /* Close Animation */
-    .message-closing {
-        animation: slideOutUp 0.3s ease-in forwards;
+    .animate-progress {
+        animation: progress 5s linear forwards;
     }
 
-    @keyframes slideOutUp {
-        from {
-            opacity: 1;
-            transform: translateY(0);
-        }
-        to {
-            opacity: 0;
-            transform: translateY(-20px);
-        }
-    }
-
-    /* Auto-hide after 5 seconds */
-    .success-message, .info-message {
-        animation: slideInDown 0.5s ease-out, fadeOut 0.5s ease-in 4.5s forwards;
-    }
-
-    @keyframes fadeOut {
-        from {
-            opacity: 1;
-        }
-        to {
-            opacity: 0;
-            transform: translateY(-10px);
-        }
+    .animate-bounce-slow {
+        animation: bounce 2s infinite;
     }
 </style>
-
-<script>
-    // Close message function
-    function closeMessage(button) {
-        const messageContainer = button.closest('.mb-6, .mb-4');
-        const messageElement = messageContainer.querySelector('.success-message, .error-message, .info-message, .warning-message, .field-error');
-        
-        messageElement.classList.add('message-closing');
-        
-        setTimeout(() => {
-            messageContainer.remove();
-        }, 300);
-    }
-
-    // Auto-hide success and info messages after 5 seconds
-    document.addEventListener('DOMContentLoaded', function() {
-        const autoHideMessages = document.querySelectorAll('.success-message, .info-message');
-        
-        autoHideMessages.forEach(message => {
-            setTimeout(() => {
-                if (message && message.parentElement) {
-                    const button = message.querySelector('button[onclick*="closeMessage"]');
-                    if (button) {
-                        closeMessage(button);
-                    }
-                }
-            }, 5000);
-        });
-    });
-
-    // Add shake animation for error messages
-    document.addEventListener('DOMContentLoaded', function() {
-        const errorMessages = document.querySelectorAll('.error-message, .field-error');
-        
-        errorMessages.forEach(message => {
-            message.style.animation = 'slideInDown 0.5s ease-out, shake 0.5s ease-in-out 0.5s';
-        });
-    });
-
-    // Shake animation keyframes
-    const shakeStyle = document.createElement('style');
-    shakeStyle.textContent = `
-        @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            10%, 30%, 50%, 70%, 90% { transform: translateX(-2px); }
-            20%, 40%, 60%, 80% { transform: translateX(2px); }
-        }
-    `;
-    document.head.appendChild(shakeStyle);
-</script>
