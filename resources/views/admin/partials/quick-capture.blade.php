@@ -66,25 +66,67 @@
 
         <!-- Contoh/Tips -->
         <div class="mt-4">
-            <span class="text-[10px] font-bold text-gray-400 uppercase tracking-wider block mb-2">Contoh Cepat:</span>
+            <span class="text-[10px] font-bold text-gray-400 uppercase tracking-wider block mb-2">Starter Pack:</span>
             <div class="flex flex-wrap gap-2">
-                <button type="button" onclick="fillExample('Beli ayam kentucky bagian dada 9k di pal 25')"
-                    class="text-xs bg-gray-100 dark:bg-slate-700 hover:bg-gray-200 dark:hover:bg-slate-600 text-gray-600 dark:text-gray-300 px-2 py-1 rounded-md transition-colors border border-gray-200 dark:border-slate-600">
-                    🍽️ Makan
+
+                <!-- 1. MAKAN (Dengan Lokasi) -->
+                <button type="button" onclick="fillExample('Beli Ayam Kentucky bagian dada 9k di Pal 25')"
+                    class="text-xs bg-gray-50 dark:bg-slate-700/50 hover:bg-orange-50 dark:hover:bg-orange-900/20 text-gray-600 dark:text-gray-300 px-3 py-2 rounded-lg transition-colors border border-gray-200 dark:border-slate-600 group flex items-center gap-2">
+                    <i class="fa-solid fa-utensils text-orange-500 group-hover:scale-110 transition-transform"></i>
+                    <span>Makan</span>
                 </button>
-                <button type="button" onclick="fillExample('Isi bensin 20rb di SPBU pal 25')"
-                    class="text-xs bg-gray-100 dark:bg-slate-700 hover:bg-gray-200 dark:hover:bg-slate-600 text-gray-600 dark:text-gray-300 px-2 py-1 rounded-md transition-colors border border-gray-200 dark:border-slate-600">
-                    ⛽ Transport
+
+                <!-- 2. TRANSPORT (Simpel) -->
+                <button type="button" onclick="fillExample('Isi bensin Pertamax 20rb di SPBU')"
+                    class="text-xs bg-gray-50 dark:bg-slate-700/50 hover:bg-blue-50 dark:hover:bg-blue-900/20 text-gray-600 dark:text-gray-300 px-3 py-2 rounded-lg transition-colors border border-gray-200 dark:border-slate-600 group flex items-center gap-2">
+                    <i class="fa-solid fa-gas-pump text-blue-500 group-hover:scale-110 transition-transform"></i>
+                    <span>Bensin</span>
                 </button>
+
+                <!-- 3. BELANJA (Dengan Qty/Pcs - Menguji Parser Baru) -->
+                <button type="button" onclick="fillExample('Indomaret: Beli Roti 10k dan Mie 2pcs 5k, Minuman 4rb')"
+                    class="text-xs bg-gray-50 dark:bg-slate-700/50 hover:bg-pink-50 dark:hover:bg-pink-900/20 text-gray-600 dark:text-gray-300 px-3 py-2 rounded-lg transition-colors border border-gray-200 dark:border-slate-600 group flex items-center gap-2">
+                    <i class="fa-solid fa-cart-shopping text-pink-500 group-hover:scale-110 transition-transform"></i>
+                    <span>Belanja</span>
+                </button>
+
+                <!-- 4. SHOPEE (Warna Khas Shopee) -->
+                <button type="button" onclick="fillExample('Shopee: Beli Baju 50rb')"
+                    class="text-xs bg-gray-50 dark:bg-slate-700/50 hover:bg-orange-100 dark:hover:bg-orange-900/30 text-gray-600 dark:text-gray-300 px-3 py-2 rounded-lg transition-colors border border-gray-200 dark:border-slate-600 group flex items-center gap-2">
+                    <i class="fa-solid fa-bag-shopping text-orange-600 group-hover:scale-110 transition-transform"></i>
+                    <span>Shopee 1</span>
+                </button>
+
+                <!-- 4.1 SHOPEE (Warna Khas Shopee) -->
+                <button type="button" onclick="fillExample('Shopee: Beli Cemilan Roti total 50k')"
+                    class="text-xs bg-gray-50 dark:bg-slate-700/50 hover:bg-orange-100 dark:hover:bg-orange-900/30 text-gray-600 dark:text-gray-300 px-3 py-2 rounded-lg transition-colors border border-gray-200 dark:border-slate-600 group flex items-center gap-2">
+                    <i class="fa-solid fa-bag-shopping text-orange-600 group-hover:scale-110 transition-transform"></i>
+                    <span>Shopee 2</span>
+                </button>
+
+                <!-- 5. TAGIHAN/DIGITAL -->
+                <button type="button" onclick="fillExample('Beli Paket Data Telkomsel 25rb')"
+                    class="text-xs bg-gray-50 dark:bg-slate-700/50 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 text-gray-600 dark:text-gray-300 px-3 py-2 rounded-lg transition-colors border border-gray-200 dark:border-slate-600 group flex items-center gap-2">
+                    <i class="fa-solid fa-wifi text-indigo-500 group-hover:scale-110 transition-transform"></i>
+                    <span>Pulsa/Data</span>
+                </button>
+
+                <!-- 6. PEMASUKAN (Joki/Gaji) -->
+                <button type="button" onclick="fillExample('Terima bayaran Joki Makalah dari Client 50k')"
+                    class="text-xs bg-gray-50 dark:bg-slate-700/50 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 text-gray-600 dark:text-gray-300 px-3 py-2 rounded-lg transition-colors border border-gray-200 dark:border-slate-600 group flex items-center gap-2">
+                    <i
+                        class="fa-solid fa-money-bill-trend-up text-emerald-500 group-hover:scale-110 transition-transform"></i>
+                    <span>Pemasukan</span>
+                </button>
+
+                <!-- 7. KOMBO (Dikasih + Jajan) -->
                 <button type="button"
                     onclick="fillExample('Dikasih mama 10rb, Beli ayam kentucky bagian dada 9k di pal 25')"
-                    class="text-xs bg-gray-100 dark:bg-slate-700 hover:bg-gray-200 dark:hover:bg-slate-600 text-gray-600 dark:text-gray-300 px-2 py-1 rounded-md transition-colors border border-gray-200 dark:border-slate-600">
-                    💰 Jajan
+                    class="text-xs bg-gray-50 dark:bg-slate-700/50 hover:bg-purple-50 dark:hover:bg-purple-900/20 text-gray-600 dark:text-gray-300 px-3 py-2 rounded-lg transition-colors border border-gray-200 dark:border-slate-600 group flex items-center gap-2">
+                    <i class="fa-solid fa-shuffle text-purple-500 group-hover:scale-110 transition-transform"></i>
+                    <span>Mix</span>
                 </button>
-                <button type="button" onclick="fillExample('Terima bayaran joki dari client 40k')"
-                    class="text-xs bg-gray-100 dark:bg-slate-700 hover:bg-gray-200 dark:hover:bg-slate-600 text-gray-600 dark:text-gray-300 px-2 py-1 rounded-md transition-colors border border-gray-200 dark:border-slate-600">
-                    💳 Pemasukan
-                </button>
+
             </div>
         </div>
     </div>
