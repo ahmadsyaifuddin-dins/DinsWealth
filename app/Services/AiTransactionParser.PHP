@@ -27,9 +27,10 @@ class AiTransactionParser
 
         Tugasmu:
         1. Deteksi item/keterangan transaksi. 
-           PENTING: Jika ada keterangan TEMPAT atau LOKASI (contoh: 'di Indomaret', 'di Pal 25', 'sama si A'), JANGAN DIBUANG. Masukkan itu ke dalam 'keterangan'.
-           Contoh salah: 'Ayam Kentucky'.
-           Contoh benar: 'Ayam Kentucky di Pal 25'.
+           - PENTING: Jika ada keterangan TEMPAT atau LOKASI (contoh: 'di Indomaret', 'di Pal 25', 'sama si A'), JANGAN DIBUANG. Masukkan itu ke dalam 'keterangan'.
+              Contoh salah: 'Ayam Kentucky'.
+              Contoh benar: 'Ayam Kentucky di Pal 25'.
+           - PENTING: Jika ada keterangan JUMLAH/KUANTITAS (5pcs, 2kg, 1 liter, 2x) -> JANGAN DIBUANG. Masukkan detail itu ke dalam 'keterangan'.
            
         2. Deteksi nominal uang (bisa format: 15k, 15rb, 15.000, 15000). Ubah jadi integer murni.
         
