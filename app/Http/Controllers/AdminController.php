@@ -61,7 +61,7 @@ class AdminController extends Controller
         // Kita gunakan Cache agar tidak boros API Key setiap refresh halaman
         // Cache akan disimpan selama 60 menit (60*60 detik)
         $aiService = new AiFinancialInsight();
-        $aiInsight = cache()->remember('dins_finance_insight_' . Auth::id(), 60 * 60, function () use ($aiService) {
+        $aiInsight = cache()->remember('dins_finance_insight_' . Auth::id(), 30 * 60, function () use ($aiService) {
             return $aiService->getInsight();
         });
         
