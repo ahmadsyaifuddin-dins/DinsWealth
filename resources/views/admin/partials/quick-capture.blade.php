@@ -8,13 +8,13 @@
     </div>
 
     <div class="relative z-10">
-        <!-- Header: Icon & Title -->
-        <div class="flex items-start gap-3 mb-4">
+        <!-- 1. HEADER: Flex-start & Spacing -->
+        <div class="flex items-start gap-4 mb-5">
             <div
-                class="flex-shrink-0 w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg shadow-indigo-500/30">
-                <i class="fas fa-magic text-white text-lg animate-pulse"></i>
+                class="flex-shrink-0 w-12 h-12 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg shadow-indigo-500/30">
+                <i class="fas fa-magic text-white text-xl animate-pulse"></i>
             </div>
-            <div>
+            <div class="pt-1">
                 <h3 class="text-lg font-bold text-gray-800 dark:text-gray-100 leading-tight">
                     Quick Capture AI
                 </h3>
@@ -24,12 +24,12 @@
             </div>
         </div>
 
-        <form action="{{ route('quick-capture.store') }}" method="POST" class="relative mt-4"
+        <form action="{{ route('quick-capture.store') }}" method="POST" class="relative mt-2"
             onsubmit="showLoading(this)">
             @csrf
 
-            <div class="flex flex-col gap-3">
-                <!-- 1. Pilih Sumber Dana (Full Width di Mobile) -->
+            <div class="flex flex-col gap-4">
+                <!-- Pilih Sumber Dana -->
                 <div class="w-full">
                     <label class="sr-only">Sumber Dana</label>
                     <div class="relative">
@@ -37,7 +37,7 @@
                             <i class="fas fa-wallet text-gray-400"></i>
                         </div>
                         <select name="wallet_id"
-                            class="w-full rounded-xl border-gray-200 dark:border-slate-600 dark:bg-slate-700/50 dark:text-gray-200 focus:border-indigo-500 focus:ring-indigo-500 py-3 pl-10 text-sm">
+                            class="w-full rounded-xl border-gray-200 dark:border-slate-600 dark:bg-slate-700/50 dark:text-gray-200 focus:border-indigo-500 focus:ring-indigo-500 py-3 pl-10 text-sm appearance-none">
                             @foreach ($namaKategori as $kategori)
                                 <option value="{{ $kategori->id }}"
                                     {{ $kategori->nama == 'Dompet (Uang Jalan)' ? 'selected' : '' }}>
@@ -45,20 +45,28 @@
                                 </option>
                             @endforeach
                         </select>
+                        <!-- Custom Arrow Icon -->
+                        <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                            <i class="fas fa-chevron-down text-gray-400 text-xs"></i>
+                        </div>
                     </div>
                 </div>
 
-                <!-- 2. Input Area (Textarea + Tombol Kirim Terpisah) -->
+                <!-- 2. TEXTAREA FIX: Space Lebih Luas -->
                 <div class="relative w-full">
-                    <!-- Ganti Input jadi Textarea -->
-                    <textarea name="raw_text" rows="4" required
+                    <!--
+                        PERBAIKAN UTAMA DI SINI:
+                        Ubah 'pr-14' menjadi 'pr-20' atau 'pr-24' agar teks tidak menabrak tombol.
+                        Saya set ke 'pr-24' (sekitar 6rem) agar aman banget.
+                    -->
+                    <textarea name="raw_text" rows="3" required
                         placeholder="Cth: Nasi padang 20rb, bensin 15k di pal 6, nemu uang 50rb..."
-                        class="w-full rounded-xl border-gray-200 dark:border-slate-600 dark:bg-slate-700/50 dark:text-gray-200 focus:border-indigo-500 focus:ring-indigo-500 p-4 text-sm placeholder-gray-400 transition-all resize-none shadow-sm focus:shadow-md"></textarea>
+                        class="w-full rounded-xl border-gray-200 dark:border-slate-600 dark:bg-slate-700/50 dark:text-gray-200 focus:border-indigo-500 focus:ring-indigo-500 p-4 pr-24 text-sm placeholder-gray-400 transition-all resize-none shadow-sm focus:shadow-md leading-relaxed"></textarea>
 
-                    <!-- Tombol Kirim (Floating di kanan bawah textarea) -->
+                    <!-- Tombol Kirim -->
                     <button type="submit" id="btn-submit-ai"
-                        class="absolute right-2 bottom-2 bg-gradient-to-r from-indigo-600 to-blue-600 text-white rounded-lg p-2.5 shadow-lg hover:shadow-indigo-500/30 hover:scale-105 active:scale-95 transition-all flex items-center justify-center group-btn">
-                        <i class="fas fa-paper-plane text-sm group-btn-hover:translate-x-1 transition-transform"></i>
+                        class="absolute right-3 bottom-3 bg-gradient-to-r from-indigo-600 to-blue-600 text-white rounded-lg w-10 h-10 shadow-lg hover:shadow-indigo-500/30 hover:scale-105 active:scale-95 transition-all flex items-center justify-center group-btn z-10">
+                        <i class="fas fa-paper-plane text-sm group-btn-hover:translate-x-0.5 transition-transform"></i>
                     </button>
                 </div>
             </div>
@@ -77,7 +85,7 @@
                 </button>
 
                 <!-- 2. TRANSPORT (Simpel) -->
-                <button type="button" onclick="fillExample('Isi bensin Pertamax 20rb di SPBU')"
+                <button type="button" onclick="fillExample('Isi bensin Pertamax 20rb di SPBU pal 25')"
                     class="text-xs bg-gray-50 dark:bg-slate-700/50 hover:bg-blue-50 dark:hover:bg-blue-900/20 text-gray-600 dark:text-gray-300 px-3 py-2 rounded-lg transition-colors border border-gray-200 dark:border-slate-600 group flex items-center gap-2">
                     <i class="fa-solid fa-gas-pump text-blue-500 group-hover:scale-110 transition-transform"></i>
                     <span>Bensin</span>
@@ -132,33 +140,12 @@
     </div>
 </div>
 
-<!-- Overlay Loading (NON-AKTIFKAN SESUAI REQUEST) -->
-<!--
-<div id="full-page-loading" class="fixed inset-0 z-50 hidden bg-gray-900/60 backdrop-blur-sm flex items-center justify-center transition-opacity duration-300">
-    <div class="bg-white dark:bg-slate-800 rounded-2xl p-6 shadow-2xl flex flex-col items-center transform scale-100 animate-bounce-slow max-w-[80%] text-center">
-        <div class="w-12 h-12 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin mb-4"></div>
-        <h3 class="text-lg font-bold text-gray-800 dark:text-white">Mencatat Transaksi...</h3>
-        <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Tunggu sebentar ya beb! 😘</p>
-    </div>
-</div>
--->
-
 <script>
     // Fungsi Efek Loading saat Submit
     function showLoading(form) {
         const btn = document.getElementById('btn-submit-ai');
         const input = form.querySelector('textarea[name="raw_text"]');
-        // const overlay = document.getElementById('full-page-loading'); // Matikan overlay
 
-        // Tampilkan overlay full screen (MATIKAN)
-        /*
-        if(overlay) {
-            overlay.classList.remove('hidden');
-            overlay.classList.add('flex');
-        }
-        */
-
-        // Ubah tombol jadi loading (Cukup di tombol saja biar lebih smooth)
         if (btn) {
             btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i>';
             btn.disabled = true;
@@ -176,8 +163,7 @@
 
         if (input) {
             input.value = text;
-            input.focus(); // Fokus ke textarea agar user bisa langsung edit
-            // form.requestSubmit(); // MATIKAN AUTO SUBMIT
+            input.focus(); // Fokus agar user bisa edit
         }
     }
 </script>
